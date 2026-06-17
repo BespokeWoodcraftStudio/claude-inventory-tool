@@ -33,3 +33,6 @@ yarn-error.log*
 # the tool's own output — never commit a user's scanned inventory
 claude-inventory.json
 /*-inventory.json
+
+# original private source moved out of my-app — preserved, never published
+/.archive/
