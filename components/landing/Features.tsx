@@ -21,7 +21,7 @@ const FEATURES = [
     tone: "var(--good)",
     title: "Secrets stripped at the source",
     body:
-      "API keys, tokens, and env values are redacted before the file is even written — there's nothing sensitive in claude-inventory.json to begin with.",
+      "Known secret fields — API keys, tokens, MCP env values, and URL credentials — are redacted before the file is written, and your home path becomes ~. The scan never sends anything anywhere.",
   },
   {
     icon: Terminal,
@@ -42,7 +42,7 @@ const FEATURES = [
     tone: "var(--project)",
     title: "Hand the cleanup to Claude",
     body:
-      "Prefer to delegate? Export a paste-to-Claude prompt and let Claude Code do the removal for you, step by step.",
+      "Prefer to delegate? Export a paste-to-Claude prompt and let Claude Code do the removal for you, step by step. The tool only generates commands — it never deletes anything itself.",
   },
 ];
 

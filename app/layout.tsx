@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description:
     "A free tool to see, organize, and clean up your Claude Code skills, plugins, MCP servers, and agents — split by global vs. project. Runs locally, sends nothing.",
   keywords: ["Claude Code", "skills", "plugins", "MCP", "agents", "inventory", "cleanup"],
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Claude Inventory Tool",
     description:
@@ -27,7 +28,11 @@ export const metadata: Metadata = {
     title: "Claude Inventory Tool",
     description: "See and organize your Claude Code skills, plugins, MCP servers, and agents.",
   },
-  icons: { icon: "/favicon.svg" },
+  // Icons come from file conventions: app/icon.svg + app/apple-icon.
+};
+
+export const viewport: Viewport = {
+  themeColor: "#141210",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

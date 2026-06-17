@@ -32,11 +32,19 @@ This tool answers them. You run one command, it reads your local Claude Code ins
 
 ### The scan
 
+**macOS / Linux** (bash/zsh):
+
 ```bash
 curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs | node
 ```
 
-Prefer to read it first? It's one short, dependency-free file ([`public/scan.mjs`](public/scan.mjs)) — download then run:
+**Windows** (PowerShell) — `curl` there is an alias for `Invoke-WebRequest`, so call `curl.exe` and download-then-run instead of piping:
+
+```powershell
+curl.exe -fsSL https://claude-inventory-tool.vercel.app/scan.mjs -o claude-inventory-scan.mjs; node claude-inventory-scan.mjs
+```
+
+Prefer to read it first? It's one short, dependency-free file ([`public/scan.mjs`](public/scan.mjs)) — download then run (use `curl.exe` on Windows):
 
 ```bash
 curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs -o claude-inventory-scan.mjs
@@ -138,9 +146,18 @@ app/inventory/page.tsx       the tool
 components/                  ui primitives + page sections
 ```
 
+## Documentation
+
+- [**FAQ**](docs/FAQ.md) (or the in-app [/faq](https://claude-inventory-tool.vercel.app/faq)) — is anything uploaded, are my keys safe, can it delete things, Windows support…
+- [**Usage guide**](docs/USAGE.md) — a walkthrough of the inventory tool: filtering, selection, and the three cleanup exports.
+- [**Setup wizard**](https://claude-inventory-tool.vercel.app/setup) — the non-technical, copy-paste path.
+- [**Security policy**](SECURITY.md) — how to privately report a redaction miss (and what we already do).
+- [**Support / troubleshooting**](SUPPORT.md) — common errors and where to get help.
+- [**Changelog**](CHANGELOG.md) · [**Contributing**](CONTRIBUTING.md) · [**Code of Conduct**](CODE_OF_CONDUCT.md)
+
 ## Contributing
 
-Issues and PRs welcome. Good first additions: deriving MCP/agent usage from transcripts, an `npx` entry point for the scanner, and more cleanup-command coverage.
+Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for the dev setup and the verify gate, and [SECURITY.md](SECURITY.md) for reporting a secret leak privately. Good first additions: deriving MCP/agent usage from transcripts, an `npx` entry point for the scanner, and more cleanup-command coverage.
 
 ## License
 

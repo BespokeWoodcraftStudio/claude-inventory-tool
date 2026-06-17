@@ -4,8 +4,11 @@ import { useState, useRef, useCallback } from "react";
 import { parseInventory, InventoryError } from "@/lib/inventory";
 import type { Inventory } from "@/lib/types";
 import { Upload, Terminal, Shield } from "@/components/ui/icons";
-import { CodeBlock } from "@/components/ui/CodeBlock";
-import { SCAN_ONELINER } from "./constants";
+import { ScanCommand } from "@/components/ui/ScanCommand";
+
+// A real scan is a few KB; cap well above that so a stray video/zip drop fails
+// fast with a clear message instead of freezing the tab on a synchronous parse.
+const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export function UploadPanel({
   onLoad, onTryDemo, compact = false,
@@ -16,6 +19,7 @@ export function UploadPanel({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showPaste, setShowPaste] = useState(false);
   const [pasteValue, setPasteValue] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -24,7 +28,7 @@ export function UploadPanel({
     setError(null);
     let parsed: unknown;
     try { parsed = JSON.parse(raw); }
-    catch { setError("That isn't valid JSON. Make sure you grabbed the whole file."); return; }
+    catch { setError("That isn't valid JSON. Make sure you copied the whole file."); return; }
     try {
       const inv = parseInventory(parsed);
       onLoad(inv, sourceName);
@@ -34,11 +38,25 @@ export function UploadPanel({
   }, [onLoad]);
 
   const handleFiles = useCallback((files: FileList | null) => {
-    const file = files?.[0];
-    if (!file) return;
+    const list = files ? Array.from(files) : [];
+    if (!list.length) return;
+    if (list.length > 1) {
+      setError("Please drop a single claude-inventory.json file.");
+      return;
+    }
+    const file = list[0];
+    if (file.size > MAX_BYTES) {
+      setError(
+        `That file is ${(file.size / 1048576).toFixed(1)} MB — too big to be an inventory. ` +
+        "A real claude-inventory.json is only a few KB. Pick the file scan.mjs produced.",
+      );
+      return;
+    }
+    setError(null);
+    setLoading(true);
     const reader = new FileReader();
-    reader.onload = () => ingest(String(reader.result || ""), file.name);
-    reader.onerror = () => setError("Couldn't read that file.");
+    reader.onload = () => { setLoading(false); ingest(String(reader.result || ""), file.name); };
+    reader.onerror = () => { setLoading(false); setError("Couldn't read that file."); };
     reader.readAsText(file);
   }, [ingest]);
 
@@ -46,6 +64,7 @@ export function UploadPanel({
     <div className="stack gap-4">
       <div
         className="card"
+        aria-busy={loading}
         style={{
           border: `1.5px dashed ${dragging ? "var(--accent)" : "var(--line-2)"}`,
           background: dragging ? "var(--accent-tint)" : "var(--panel)",
@@ -61,7 +80,9 @@ export function UploadPanel({
           </div>
           <div className="stack gap-1 center">
             <div style={{ fontSize: 17, fontWeight: 620 }}>Drop your <code className="inline">claude-inventory.json</code> here</div>
-            <div className="muted" style={{ fontSize: 14 }}>or choose it manually — nothing leaves your browser</div>
+            <div className="muted" style={{ fontSize: 14 }}>
+              {loading ? "Reading your file…" : "or choose it manually — nothing leaves your browser"}
+            </div>
           </div>
           <div className="row gap-2 wrap center">
             <button className="btn btn-primary" onClick={() => fileRef.current?.click()}>
@@ -81,10 +102,11 @@ export function UploadPanel({
 
       {showPaste && (
         <div className="card stack gap-3">
-          <label className="muted" style={{ fontSize: 13, fontWeight: 600 }}>
+          <label htmlFor="paste-json" className="muted" style={{ fontSize: 13, fontWeight: 600 }}>
             Paste the contents of <code className="inline">claude-inventory.json</code>
           </label>
           <textarea
+            id="paste-json"
             className="input" style={{ minHeight: 140 }}
             placeholder='{ "schemaVersion": 1, "items": [ … ] }'
             value={pasteValue} onChange={(e) => setPasteValue(e.target.value)}
@@ -98,7 +120,7 @@ export function UploadPanel({
       )}
 
       {error && (
-        <div className="card" style={{ borderColor: "var(--bad)", background: "var(--bad-tint)", color: "var(--fg)" }}>
+        <div role="alert" className="card" style={{ borderColor: "var(--bad)", background: "var(--bad-tint)", color: "var(--fg)" }}>
           <strong style={{ color: "var(--bad)" }}>Hmm — </strong>{error}
         </div>
       )}
@@ -107,13 +129,13 @@ export function UploadPanel({
         <div className="card stack gap-3">
           <div className="row gap-2"><Terminal size={16} /><strong style={{ fontSize: 14 }}>Don&apos;t have the file yet?</strong></div>
           <p className="muted" style={{ fontSize: 14 }}>
-            Run this one line in your terminal. It reads your local Claude Code install and writes
+            Run this in your terminal. It reads your local Claude Code install and writes
             <code className="inline"> claude-inventory.json</code> next to you. Zero dependencies, nothing sent anywhere.
           </p>
-          <CodeBlock code={SCAN_ONELINER} />
+          <ScanCommand />
           <div className="row gap-2" style={{ color: "var(--good)", fontSize: 13 }}>
             <Shield size={15} />
-            <span className="muted">Secrets (API keys, tokens, MCP env) are stripped before the file is written.</span>
+            <span className="muted">Known secrets (API keys, tokens, MCP env values) are stripped before the file is written.</span>
           </div>
         </div>
       )}

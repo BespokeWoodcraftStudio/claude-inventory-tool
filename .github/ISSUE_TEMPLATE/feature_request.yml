@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest an improvement or a new capability.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. A clear sense of the problem you're hitting helps more than a fully
+        formed solution, so don't worry if you're not sure how it should work yet.
+
+        A few good first additions are already on the wishlist, if you're looking for somewhere to start:
+
+        - Deriving MCP server and agent usage from Claude Code transcripts (they have no usage signal in local config today, so they show as *passive*).
+        - An `npx` entry point for the scanner, so people can run it without downloading the file first.
+        - More cleanup-command coverage (more item types, more export formats).
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem / motivation
+      description: What are you trying to do, and what's getting in the way?
+      placeholder: I want to ... but right now ...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: If you have one in mind, describe how you'd like it to work.
+      placeholder: It would help if ...
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you've tried or thought about, and why they fall short.
+      placeholder: I also considered ...
+    validations:
+      required: false

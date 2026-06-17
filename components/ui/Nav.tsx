@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/", label: "Home", hideSm: true }, // logo already links home
   { href: "/setup", label: "Setup", hideSm: false },
   { href: "/inventory", label: "Inventory", hideSm: false },
+  { href: "/faq", label: "FAQ", hideSm: false },
 ];
 
 const REPO = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";

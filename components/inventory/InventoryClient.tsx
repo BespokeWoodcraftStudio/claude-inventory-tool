@@ -172,22 +172,21 @@ function StatStrip({ stats, filters, setFilters }: {
   stats: ReturnType<typeof computeStats>; filters: Filters; setFilters: (f: Filters) => void;
 }) {
   const cells = [
-    { num: stats.total, lbl: "total items", onClick: () => setFilters({ ...DEFAULT_FILTERS }) },
-    { num: stats.global, lbl: "global", tone: "var(--global)", onClick: () => setFilters({ ...filters, scope: "global", project: "all" }) },
-    { num: stats.project, lbl: "project", tone: "var(--project)", onClick: () => setFilters({ ...filters, scope: "project" }) },
-    { num: stats.byUsage.good, lbl: "actively used", tone: "var(--good)", onClick: () => setFilters({ ...filters, usage: "good" }) },
-    { num: stats.unusedCount, lbl: "unused", tone: "var(--bad)", onClick: () => setFilters({ ...filters, usage: "unused" }) },
+    { num: stats.total, lbl: "total items", aria: "Show all items", onClick: () => setFilters({ ...DEFAULT_FILTERS }) },
+    { num: stats.global, lbl: "global", tone: "var(--global)", aria: "Filter to global items", onClick: () => setFilters({ ...filters, scope: "global", project: "all" }) },
+    { num: stats.project, lbl: "project", tone: "var(--project)", aria: "Filter to project items", onClick: () => setFilters({ ...filters, scope: "project" }) },
+    { num: stats.byUsage.good, lbl: "actively used", tone: "var(--good)", aria: "Filter to actively used items", onClick: () => setFilters({ ...filters, usage: "good" }) },
+    { num: stats.unusedCount, lbl: "unused", tone: "var(--bad)", aria: "Filter to unused items", onClick: () => setFilters({ ...filters, usage: "unused" }) },
   ];
   return (
     <div className="card" style={{ padding: 0, overflow: "hidden", marginBottom: 16 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))" }}>
         {cells.map((c, i) => (
           <button key={c.lbl} onClick={c.onClick}
-            className="stat"
-            style={{
-              padding: "18px 20px", textAlign: "left", background: "transparent", cursor: "pointer",
-              border: "none", borderLeft: i === 0 ? "none" : "1px solid var(--line)", transition: ".14s",
-            }}
+            className="stat stat-cell"
+            aria-label={`${c.aria} (${c.num})`}
+            title={`${c.aria} (${c.num})`}
+            style={{ padding: "18px 20px", borderLeft: i === 0 ? "none" : "1px solid var(--line)" }}
           >
             <span className="num" style={{ color: c.tone || "var(--fg)" }}>{c.num}</span>
             <span className="lbl">{c.lbl}</span>

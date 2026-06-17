@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
-
-type Os = "mac" | "windows";
+import { useOs, setOs } from "@/components/ui/use-os";
 
 /**
- * A tiny Mac / Windows toggle for "Open your terminal" instructions.
- * Kept self-contained so the rest of the /setup page can stay a server component.
+ * A tiny Mac / Windows toggle for "Open your terminal" instructions. It shares
+ * the app-wide OS selection, so choosing here also swaps the scan command shown
+ * in Step 2 (and vice-versa). Kept client-side so /setup stays a server component.
  */
 export function OsTabs() {
-  const [os, setOs] = useState<Os>("mac");
+  const os = useOs();
 
   return (
     <div className="stack gap-3">

@@ -15,8 +15,9 @@
 // anywhere. Secrets are aggressively redacted before they ever touch the
 // output file: MCP env values, auth headers, tokens, and URL credentials
 // are replaced with "<redacted>". Your home directory is rewritten to "~".
-// One thing it does NOT scrub: skill/agent descriptions are copied as-is from
-// their frontmatter, so don't keep secrets in a SKILL.md description.
+// Skill/agent descriptions are prose blurbs copied from their frontmatter; we
+// also scrub obvious token shapes (sk-…, ghp_…, "Authorization: …") out of them,
+// but that pass is best-effort — don't keep secrets in a SKILL.md description.
 // Read this file before you run it — it's short and has no dependencies.
 //
 // SPDX-License-Identifier: MIT
@@ -49,19 +50,49 @@ const listDir = (p, kind) => {
 };
 
 // Pull `name:` and `description:` out of YAML-ish frontmatter without a YAML dep.
+// Handles single-line scalars, quoted values, and block scalars (`>`, `>-`, `|`,
+// `|-`) — the conventional way skills write their long, multi-line descriptions.
 function parseFrontmatter(text) {
   if (!text) return {};
   const m = text.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
   if (!m) return {};
   const out = {};
-  for (const line of m[1].split(/\r?\n/)) {
+  const lines = m[1].split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const kv = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
     if (!kv) continue;
+    const key = kv[1];
     let v = kv[2].trim();
+
+    // Block scalar: `>` (folded → spaces) or `|` (literal → newlines), with an
+    // optional chomp indicator and trailing comment. The body is the following
+    // more-indented lines, ending at the first line dedented to the key or less.
+    const block = v.match(/^([|>])[+-]?\s*(?:#.*)?$/);
+    if (block) {
+      const folded = block[1] === ">";
+      const keyIndent = (line.match(/^(\s*)/) || ["", ""])[1].length;
+      const body = [];
+      let j = i + 1;
+      for (; j < lines.length; j++) {
+        if (lines[j].trim() === "") { body.push(""); continue; }
+        const ind = (lines[j].match(/^(\s*)/) || ["", ""])[1].length;
+        if (ind <= keyIndent) break;
+        body.push(lines[j]);
+      }
+      const firstContent = body.find((b) => b.trim() !== "") || "";
+      const baseIndent = (firstContent.match(/^(\s*)/) || ["", ""])[1].length;
+      const stripped = body.map((b) => b.slice(baseIndent));
+      while (stripped.length && stripped[stripped.length - 1].trim() === "") stripped.pop();
+      out[key] = folded ? stripped.join(" ").replace(/\s+/g, " ").trim() : stripped.join("\n");
+      i = j - 1;
+      continue;
+    }
+
     if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
       v = v.slice(1, -1);
     }
-    out[kv[1]] = v;
+    out[key] = v;
   }
   return out;
 }
@@ -73,6 +104,27 @@ const LOOKS_SECRET = /^(?:[A-Za-z0-9._\-]{24,}|sk-[A-Za-z0-9._\-]+|gh[pousr]_[A-
 
 // A KEY=value pair whose key names a secret (e.g. API_KEY=…, auth-token=…).
 const SECRET_KV = /^[A-Za-z0-9_.-]*(?:key|token|secret|password|passwd|auth|bearer|credential)[A-Za-z0-9_.-]*=.+/i;
+
+// A bare opaque string that looks like a credential rather than a flag/package:
+// a known token shape, or 18+ mixed letters+digits in a single run (no path,
+// scope, or version shape) — so we don't redact package names ("playwright"),
+// semvers ("4.22.4"), or scoped packages ("@scope/pkg").
+function looksLikeToken(s) {
+  if (!s) return false;
+  if (LOOKS_SECRET.test(s)) return true;
+  return s.length >= 18 && /^[A-Za-z0-9._-]+$/.test(s) && /[A-Za-z]/.test(s) && /[0-9]/.test(s)
+    && !/^v?\d+\.\d+/.test(s) && !s.includes("..");
+}
+
+// Scrub secrets embedded *inside* a single string (a combined arg, or a prose
+// description): known token shapes anywhere, plus a secret-named label followed
+// by an opaque value (e.g. `Authorization: Bearer sk-…`, `X-Api-Key: abc123…`).
+function scrubSecrets(s) {
+  if (!s) return s;
+  return String(s)
+    .replace(/sk-[A-Za-z0-9._-]{8,}|gh[pousr]_[A-Za-z0-9]{8,}|xox[baprs]-[A-Za-z0-9-]{6,}|AKIA[0-9A-Z]{12,}/g, "<redacted>")
+    .replace(/((?:authorization|bearer|api[_-]?key|access[_-]?token|client[_-]?secret|x-[a-z-]*key|token|secret|password|passwd|credential)["':=\s]+)([A-Za-z0-9._\-+/]{12,})/gi, "$1<redacted>");
+}
 
 function redactArgs(argv) {
   if (!Array.isArray(argv)) return argv;
@@ -87,20 +139,16 @@ function redactArgs(argv) {
     }
     // KEY=value where the key names a secret (flag or positional form).
     if (SECRET_KV.test(a)) { out.push(a.split("=")[0] + "=<redacted>"); continue; }
-    // A URL / connection string carrying credentials or a query string.
+    // Any URL / connection string: always sanitize it — userinfo, query string,
+    // and token-looking path segments (some hosted MCP endpoints key by path).
     if (/^[a-z][a-z0-9+.-]*:\/\//i.test(a)) {
-      try { const u = new URL(a); if (u.username || u.password || u.search) { out.push(redactUrl(a)); continue; } }
-      catch { /* not a URL */ }
+      try { new URL(a); out.push(redactUrl(a)); continue; } catch { /* not a URL */ }
     }
-    if (LOOKS_SECRET.test(a)) { out.push("<redacted>"); continue; }
-    // A bare opaque token: 18+ mixed letters+digits in a single run (no path,
-    // scope, or version shape). Catches tokens/UUIDs/keys passed positionally
-    // without redacting package names ("playwright"), semvers ("4.22.4"), or
-    // scoped packages ("@scope/pkg").
-    if (a.length >= 18 && /^[A-Za-z0-9._-]+$/.test(a) && /[A-Za-z]/.test(a) && /[0-9]/.test(a)
-        && !/^v?\d+\.\d+/.test(a) && !a.includes("..")) {
-      out.push("<redacted>"); continue;
-    }
+    // A bare opaque token passed positionally.
+    if (looksLikeToken(a)) { out.push("<redacted>"); continue; }
+    // A secret embedded inside one combined arg (e.g. a single `--header` value).
+    const scrubbed = scrubSecrets(a);
+    if (scrubbed !== a) { out.push(scrubbed); continue; }
     // Rewrite absolute home paths so usernames don't leak in args.
     out.push(a.startsWith(HOME) ? tilde(a) : a);
   }
@@ -108,12 +156,16 @@ function redactArgs(argv) {
 }
 
 function redactUrl(u) {
+  const raw = String(u);
   try {
-    const url = new URL(String(u));
-    if (url.username || url.password) { url.username = "redacted"; url.password = ""; }
-    if (url.search) url.search = "?<redacted>";
-    return url.toString();
-  } catch { return String(u).replace(/([?&][^=]+=)[^&]+/g, "$1<redacted>"); }
+    const url = new URL(raw);
+    const auth = url.username || url.password ? "redacted@" : "";
+    const segments = url.pathname.split("/").map((seg) => (looksLikeToken(seg) ? "<redacted>" : seg));
+    const query = url.search ? "?<redacted>" : "";
+    return `${url.protocol}//${auth}${url.host}${segments.join("/")}${query}`;
+  } catch {
+    return raw.replace(/([?&][^=]+=)[^&]+/g, "$1<redacted>");
+  }
 }
 
 function redactRecord(obj) {
@@ -196,7 +248,7 @@ function addSkill(scope, project, dirName, skillDir) {
   items.push({
     id: `skill:${scope === "global" ? "global" : "project:" + project}:${dirName}`,
     type: "skill", scope, project: scope === "global" ? null : project,
-    name, description: fm.description || "",
+    name, description: scrubSecrets(fm.description || ""),
     path: tilde(skillDir),
     usageCount, lastUsedAt, usageClass,
     usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),
@@ -217,7 +269,7 @@ function addAgent(scope, project, fileName, agentFile) {
   items.push({
     id: `agent:${scope === "global" ? "global" : "project:" + project}:${base}`,
     type: "agent", scope, project: scope === "global" ? null : project,
-    name, description: fm.description || "",
+    name, description: scrubSecrets(fm.description || ""),
     path: tilde(agentFile),
     usageCount, lastUsedAt, usageClass,
     usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),

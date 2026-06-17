@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CodeBlock } from "@/components/ui/CodeBlock";
+import { ScanCommand } from "@/components/ui/ScanCommand";
 import { Terminal, Shield, Check, Arrow, Upload, Github, Search } from "@/components/ui/icons";
-import { SCAN_ONELINER, SCAN_TWO_STEP } from "@/components/inventory/constants";
+import { SITE_URL } from "@/components/inventory/constants";
 import { OsTabs } from "@/components/setup/OsTabs";
 
 export const metadata: Metadata = {
   title: "Setup",
   description:
     "A friendly, step-by-step walkthrough to load your Claude Code inventory in about two minutes. No coding, no GitHub, 100% local.",
+  alternates: { canonical: "/setup" },
+  openGraph: {
+    title: "Set up the Claude Inventory Tool in 2 minutes",
+    description:
+      "A friendly, step-by-step walkthrough to load your Claude Code inventory in about two minutes. No coding, no GitHub, 100% local.",
+    url: "/setup",
+  },
 };
 
 const GITHUB_URL = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";
@@ -83,11 +90,11 @@ export default function Setup() {
         {/* Step 2 — paste the command */}
         <Step n={2} title="Paste this one command and press Enter">
           <p className="setup-text">
-            Copy the line below, click into the terminal window, paste it, and press{" "}
-            <span className="kbd">Enter</span>.
+            Make sure your computer is selected below, then copy the line, click into the terminal
+            window, paste it, and press <span className="kbd">Enter</span>.
           </p>
           <div style={{ marginTop: 16, marginBottom: 18 }}>
-            <CodeBlock code={SCAN_ONELINER} />
+            <ScanCommand />
           </div>
 
           <div className="card card-2" style={{ padding: "16px 18px" }}>
@@ -127,7 +134,12 @@ export default function Setup() {
             on Windows), close and reopen the terminal — or install Node from{" "}
             <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer"
               style={{ color: "var(--accent-soft)", textDecoration: "underline" }}>nodejs.org</a>{" "}
-            — then paste the line again.
+            — then paste the line again. On older Windows without{" "}
+            <code className="inline">curl.exe</code>, swap the first part for{" "}
+            <code className="inline">iwr {SITE_URL}/scan.mjs -OutFile claude-inventory-scan.mjs</code>,
+            or just open <a href="/scan.mjs" target="_blank" rel="noopener noreferrer"
+              style={{ color: "var(--accent-soft)", textDecoration: "underline" }}>/scan.mjs</a>{" "}
+            in your browser, save it, and run <code className="inline">node</code> on the saved file.
           </p>
 
           {/* cautious two-step alternative */}
@@ -137,14 +149,16 @@ export default function Setup() {
             </summary>
             <div className="setup-details-body">
               <p className="setup-text">
-                This downloads the script as a file first, so you can open and read it, then runs it
-                as a second step. Paste both lines:
+                This saves the script as <code className="inline">claude-inventory-scan.mjs</code> so
+                you can open and read it first, then runs it as a second step. Paste both lines:
               </p>
               <div style={{ marginTop: 12 }}>
-                <CodeBlock code={SCAN_TWO_STEP} />
+                <ScanCommand variant="twoStep" showToggle={false} />
               </div>
               <p className="setup-text faint" style={{ marginTop: 12, marginBottom: 0 }}>
-                The result is identical — you just get to inspect the script in between.
+                Running it creates the data file <code className="inline">claude-inventory.json</code> —
+                that&apos;s the one you drop into the app. The result is identical to the one-liner; you
+                just get to inspect the script in between.
               </p>
             </div>
           </details>
@@ -157,8 +171,10 @@ export default function Setup() {
             <code className="inline">✓ wrote claude-inventory.json</code> with the exact location.
             The file is named <code className="inline">claude-inventory.json</code> and it&apos;s
             saved in whatever folder the terminal was pointing at — for a terminal you just opened,
-            that&apos;s your home folder (the one with your name on it). Trust the printed{" "}
-            <code className="inline">✓</code> path over guessing.
+            that&apos;s your home folder (the one with your name on it). On a Mac that&apos;s{" "}
+            <code className="inline">/Users/you</code>; on Windows it&apos;s{" "}
+            <code className="inline">C:\Users\you</code> (the first entry under Home / Quick access in
+            File Explorer). Trust the printed <code className="inline">✓</code> path over guessing.
           </p>
           <div
             className="row gap-2"
@@ -168,8 +184,9 @@ export default function Setup() {
               <Check size={16} />
             </span>
             <p className="setup-text" style={{ margin: 0 }}>
-              Don&apos;t worry about hunting for it on disk — in the next step you can simply drag it
-              straight out of that terminal location, or browse to it.
+              Don&apos;t worry about hunting for it on disk — in the next step you can open your file
+              browser to that folder and pick it (on a Mac you can also drag it straight out of the
+              terminal).
             </p>
           </div>
         </Step>

@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { CodeBlock } from "@/components/ui/CodeBlock";
+import { ScanCommand } from "@/components/ui/ScanCommand";
 import { Arrow, Shield, Terminal } from "@/components/ui/icons";
-import { SCAN_ONELINER } from "@/components/inventory/constants";
 
 /**
  * Hero — eyebrow, headline, subhead, two CTAs, the scan one-liner with a
@@ -44,7 +43,7 @@ export function Hero() {
                 <Terminal size={15} />
                 <span>Run this once in your terminal</span>
               </div>
-              <CodeBlock code={SCAN_ONELINER} />
+              <ScanCommand />
               <div className="row gap-1 faint lp-scan-note">
                 <Shield size={13} />
                 <span>

@@ -59,11 +59,12 @@ export function parseInventory(raw: unknown): Inventory {
       r.usageClass as UsageClass,
     ) ? (r.usageClass as UsageClass) : "unknown";
 
+    const source = asString(r.source);
     items.push({
-      id: asString(r.id) || `${type}:${scope}:${project ?? "global"}:${name}`,
+      id: asString(r.id) || `${type}:${scope === "global" ? "global" : "project:" + project}:${name}`,
       type, scope, project, name,
       description: asString(r.description) || "",
-      source: asString(r.source),
+      source,
       path: asString(r.path),
       version: asString(r.version),
       usageCount: typeof r.usageCount === "number" ? r.usageCount : null,
@@ -71,7 +72,7 @@ export function parseInventory(raw: unknown): Inventory {
       usageClass,
       usageLabel: asString(r.usageLabel),
       overlap: asString(r.overlap),
-      removeCmd: asString(r.removeCmd) || deriveRemoveCmd({ type, scope, project, name } as InventoryItem),
+      removeCmd: asString(r.removeCmd) || deriveRemoveCmd({ type, scope, project, name, source } as InventoryItem),
     });
   });
 
@@ -94,9 +95,12 @@ export function parseInventory(raw: unknown): Inventory {
 
 /** Fallback remove command when a scan didn't include one. */
 export function deriveRemoveCmd(it: Pick<InventoryItem, "type" | "scope" | "project" | "name" | "source">): string {
-  const { type, scope, name } = it;
+  const { type, scope, name, source } = it;
   switch (type) {
-    case "plugin": return `claude plugins uninstall ${name} -y`;
+    // The CLI needs the name@marketplace form; `source` carries the marketplace.
+    case "plugin": return source
+      ? `claude plugins uninstall ${name}@${source.split(" ")[0]} -y`
+      : `claude plugins uninstall ${name} -y`;
     case "mcp":    return scope === "global" ? `claude mcp remove ${name} -s user` : `claude mcp remove ${name}`;
     case "agent":  return scope === "global" ? `rm ~/.claude/agents/${name}.md` : `git rm .claude/agents/${name}.md`;
     case "skill":  return scope === "global" ? `rm -rf ~/.claude/skills/${name}` : `git rm -r .claude/skills/${name}`;
