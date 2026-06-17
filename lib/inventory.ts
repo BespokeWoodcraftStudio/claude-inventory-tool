@@ -49,8 +49,9 @@ export function parseInventory(raw: unknown): Inventory {
   obj.items.forEach((it, i) => {
     if (!it || typeof it !== "object") return;
     const r = it as Record<string, unknown>;
-    const type = r.type as ItemType;
-    if (!TYPE_ORDER.includes(type)) return;
+    const rawType = r.type;
+    if (typeof rawType !== "string" || !TYPE_ORDER.includes(rawType as ItemType)) return;
+    const type = rawType as ItemType;
     const scope: Scope = r.scope === "project" ? "project" : "global";
     const name = asString(r.name) || `item-${i}`;
     const project = scope === "project" ? asString(r.project) || "unknown" : null;

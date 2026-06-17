@@ -81,7 +81,7 @@ function HeroPreview() {
           </div>
           <PreviewRow name="commit-helper" type="skill" tone="accent" usage="used 38×" usageTone="good" />
           <PreviewRow name="pdf-extractor" type="skill" tone="accent" usage="never used" usageTone="bad" />
-          <PreviewRow name="github" type="mcp" tone="project" usage="used 12×" usageTone="good" />
+          <PreviewRow name="github" type="mcp" tone="project" usage="passive" usageTone="info" />
         </div>
 
         {/* project group */}
@@ -91,7 +91,7 @@ function HeroPreview() {
             <span className="faint" style={{ fontSize: 12 }}>my-app/.claude</span>
           </div>
           <PreviewRow name="seo-audit" type="plugin" tone="info" usage="used 4×" usageTone="good" />
-          <PreviewRow name="old-scraper" type="agent" tone="global" usage="never used" usageTone="bad" />
+          <PreviewRow name="old-scraper" type="agent" tone="global" usage="no signal" usageTone="muted" />
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@ function PreviewRow({
   type: string;
   tone: string;
   usage: string;
-  usageTone: "good" | "bad";
+  usageTone: "good" | "bad" | "warn" | "info" | "muted";
 }) {
   return (
     <div className="lp-preview-row row gap-2 wrap">

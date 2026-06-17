@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Inventory, InventoryItem, ItemType, UsageClass } from "@/lib/types";
 import {
-  computeStats, filterItems, groupByScope, DEFAULT_FILTERS,
+  computeStats, filterItems, groupByScope, DEFAULT_FILTERS, parseInventory,
   TYPE_META, TYPE_ORDER, USAGE_META, type Filters,
 } from "@/lib/inventory";
 import { demoInventory } from "@/lib/demo";
@@ -30,12 +30,12 @@ export function InventoryClient() {
     try {
       const rawInv = localStorage.getItem(LS_INV);
       if (rawInv) {
-        const inv = JSON.parse(rawInv) as Inventory;
-        if (inv && Array.isArray(inv.items)) {
-          setInventory(inv);
-          setIsDemo(false);
-          setSourceName(localStorage.getItem(LS_SRC) || "your inventory");
-        }
+        // Re-validate through parseInventory so stale/hand-edited storage can
+        // never feed unknown item types into the stat reducers.
+        const inv = parseInventory(JSON.parse(rawInv));
+        setInventory(inv);
+        setIsDemo(false);
+        setSourceName(localStorage.getItem(LS_SRC) || "your inventory");
       }
       const rawSel = localStorage.getItem(LS_SEL);
       if (rawSel) setSelected(new Set(JSON.parse(rawSel) as string[]));
@@ -73,10 +73,18 @@ export function InventoryClient() {
   const selectedItems = useMemo(() => items.filter((i) => selected.has(i.id)), [items, selected]);
 
   const toggle = useCallback((id: string) => {
-    setSelected((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setSelected((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
   }, []);
   const selectMany = useCallback((ids: string[], on: boolean) => {
-    setSelected((prev) => { const n = new Set(prev); for (const id of ids) on ? n.add(id) : n.delete(id); return n; });
+    setSelected((prev) => {
+      const n = new Set(prev);
+      for (const id of ids) { if (on) n.add(id); else n.delete(id); }
+      return n;
+    });
   }, []);
 
   return (
@@ -212,6 +220,7 @@ function FilterBar({ inventory, stats, filters, setFilters }: {
           <span style={{ position: "absolute", left: 12, color: "var(--faint)", display: "flex" }}><Search size={15} /></span>
           <input
             className="input" style={{ paddingLeft: 34 }} placeholder="Search name, description, overlap…"
+            aria-label="Search inventory"
             value={filters.query} onChange={(e) => setFilters({ ...filters, query: e.target.value })}
           />
         </div>
@@ -226,6 +235,7 @@ function FilterBar({ inventory, stats, filters, setFilters }: {
         </div>
         {inventory.projects.length > 1 && (
           <select className="input" style={{ width: "auto", minWidth: 150 }}
+            aria-label="Filter by project"
             value={filters.project}
             onChange={(e) => setFilters({ ...filters, project: e.target.value, scope: e.target.value === "all" ? filters.scope : "project" })}>
             <option value="all">All projects</option>
@@ -264,7 +274,7 @@ function GroupSection({ label, scope, items, selected, onToggle, onSelectMany }:
       <div className="row between wrap gap-2" style={{ marginBottom: 10, paddingBottom: 8, borderBottom: "1px solid var(--line)" }}>
         <div className="row gap-2">
           <span className={`badge ${scope}`}><span className="dot" />{scope === "global" ? "Global" : "Project"}</span>
-          <strong style={{ fontSize: 15 }}>{label}</strong>
+          <h2 style={{ fontSize: 15, fontWeight: 650, margin: 0 }}>{label}</h2>
           <span className="muted tnum" style={{ fontSize: 13 }}>{items.length} item{items.length === 1 ? "" : "s"}</span>
           {selectedHere > 0 && <span className="badge accent">{selectedHere} selected</span>}
         </div>

@@ -19,7 +19,7 @@
   --fg:        #f4efe8;
   --fg-soft:   #d8cfc4;
   --dim:       #a99a8b;
-  --faint:     #756a5e;
+  --faint:     #908475; /* lightened to clear WCAG AA on panel surfaces */
 
   /* clay accent (Claude) */
   --accent:        #d97757;
@@ -243,4 +243,16 @@ textarea.input { resize: vertical; font-family: var(--mono); font-size: 12.5px; 
   .nav-links { gap: 2px; }
   .nav-link { padding: 7px 9px; font-size: 13.5px; }
   .stat .num { font-size: 26px; }
+}
+
+/* respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .btn-primary:hover:not(:disabled) { transform: none; }
+  .lp-preview-card { transform: none !important; }
 }

@@ -2,7 +2,7 @@
 // =============================================================
 // Claude Inventory Tool — local scan
 //
-//   curl -fsSL https://<your-deploy>/scan.mjs | node
+//   curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs | node
 //   # or:  node scan.mjs            (writes ./claude-inventory.json)
 //          node scan.mjs --stdout   (prints JSON to stdout instead)
 //
@@ -15,6 +15,8 @@
 // anywhere. Secrets are aggressively redacted before they ever touch the
 // output file: MCP env values, auth headers, tokens, and URL credentials
 // are replaced with "<redacted>". Your home directory is rewritten to "~".
+// One thing it does NOT scrub: skill/agent descriptions are copied as-is from
+// their frontmatter, so don't keep secrets in a SKILL.md description.
 // Read this file before you run it — it's short and has no dependencies.
 //
 // SPDX-License-Identifier: MIT
@@ -69,19 +71,36 @@ const SECRET_HINT = /(key|token|secret|password|passwd|auth|bearer|credential|ap
 // A long opaque string that looks like a credential rather than a flag/package.
 const LOOKS_SECRET = /^(?:[A-Za-z0-9._\-]{24,}|sk-[A-Za-z0-9._\-]+|gh[pousr]_[A-Za-z0-9]+|xox[baprs]-[A-Za-z0-9-]+)$/;
 
+// A KEY=value pair whose key names a secret (e.g. API_KEY=…, auth-token=…).
+const SECRET_KV = /^[A-Za-z0-9_.-]*(?:key|token|secret|password|passwd|auth|bearer|credential)[A-Za-z0-9_.-]*=.+/i;
+
 function redactArgs(argv) {
   if (!Array.isArray(argv)) return argv;
   const out = [];
   for (let i = 0; i < argv.length; i++) {
     const a = String(argv[i]);
-    // Redact the value that follows a secret-looking flag.
-    if (out.length && SECRET_HINT.test(String(argv[i - 1])) && /^-/.test(String(argv[i - 1]))) {
+    const prev = i > 0 ? String(argv[i - 1]) : "";
+    // Redact the value that follows a secret-introducing token (a flag like
+    // --token, or a bare label like "password"). Don't redact another flag.
+    if (prev && SECRET_HINT.test(prev) && !/^-/.test(a) && !SECRET_HINT.test(a)) {
       out.push("<redacted>"); continue;
     }
-    if (/^--?[A-Za-z]/.test(a) && SECRET_HINT.test(a) && a.includes("=")) {
-      out.push(a.split("=")[0] + "=<redacted>"); continue;
+    // KEY=value where the key names a secret (flag or positional form).
+    if (SECRET_KV.test(a)) { out.push(a.split("=")[0] + "=<redacted>"); continue; }
+    // A URL / connection string carrying credentials or a query string.
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(a)) {
+      try { const u = new URL(a); if (u.username || u.password || u.search) { out.push(redactUrl(a)); continue; } }
+      catch { /* not a URL */ }
     }
     if (LOOKS_SECRET.test(a)) { out.push("<redacted>"); continue; }
+    // A bare opaque token: 18+ mixed letters+digits in a single run (no path,
+    // scope, or version shape). Catches tokens/UUIDs/keys passed positionally
+    // without redacting package names ("playwright"), semvers ("4.22.4"), or
+    // scoped packages ("@scope/pkg").
+    if (a.length >= 18 && /^[A-Za-z0-9._-]+$/.test(a) && /[A-Za-z]/.test(a) && /[0-9]/.test(a)
+        && !/^v?\d+\.\d+/.test(a) && !a.includes("..")) {
+      out.push("<redacted>"); continue;
+    }
     // Rewrite absolute home paths so usernames don't leak in args.
     out.push(a.startsWith(HOME) ? tilde(a) : a);
   }
@@ -183,7 +202,7 @@ function addSkill(scope, project, dirName, skillDir) {
     usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),
     removeCmd: scope === "global"
       ? `rm -rf ${tilde(skillDir)}`
-      : `git rm -r .claude/skills/${dirName}   # in ${project} (or: rm -rf ${tilde(skillDir)})`,
+      : `git rm -r .claude/skills/${dirName}`,
   });
 }
 
@@ -204,7 +223,7 @@ function addAgent(scope, project, fileName, agentFile) {
     usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),
     removeCmd: scope === "global"
       ? `rm ${tilde(agentFile)}`
-      : `git rm .claude/agents/${fileName}   # in ${project} (or: rm ${tilde(agentFile)})`,
+      : `git rm .claude/agents/${fileName}`,
   });
 }
 
@@ -219,7 +238,7 @@ function addMcp(scope, project, name, cfg) {
     usageLabel: "passive (surfaced on demand)",
     removeCmd: scope === "global"
       ? `claude mcp remove ${name} -s user`
-      : `claude mcp remove ${name}   # from ${project}`,
+      : `claude mcp remove ${name}`,
   });
 }
 
@@ -246,16 +265,21 @@ if (installed && installed.plugins) {
     const usageCount = u ? (u.usageCount ?? null) : null;
     const lastUsedAt = u ? (u.lastUsedAt ?? null) : null;
     const usageClass = classifyUsage(usageCount, lastUsedAt);
+    const installPath = entry && entry.installPath
+      ? (entry.installPath.startsWith(HOME) ? tilde(entry.installPath) : "<external>")
+      : undefined;
     items.push({
-      id: `plugin:global:${key}`,
+      // Bare name; the marketplace lives in `source` (matches the demo shape).
+      id: `plugin:global:${pluginName}`,
       type: "plugin", scope: "global", project: null,
-      name: key,
+      name: pluginName,
       description: "", // not stored locally; the demo/curation can add it
       source: marketplace || "",
       version: entry ? entry.version : undefined,
-      path: entry ? tilde(entry.installPath) : undefined,
+      path: installPath,
       usageCount, lastUsedAt, usageClass,
       usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),
+      // The CLI wants the full name@marketplace form to uninstall.
       removeCmd: `claude plugins uninstall ${key} -y`,
     });
   }

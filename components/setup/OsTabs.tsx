@@ -13,11 +13,10 @@ export function OsTabs() {
 
   return (
     <div className="stack gap-3">
-      <div className="row gap-1" role="tablist" aria-label="Choose your operating system">
+      <div className="row gap-1" role="group" aria-label="Choose your operating system">
         <button
           type="button"
-          role="tab"
-          aria-selected={os === "mac"}
+          aria-pressed={os === "mac"}
           className={`chip${os === "mac" ? " active" : ""}`}
           onClick={() => setOs("mac")}
         >
@@ -25,8 +24,7 @@ export function OsTabs() {
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={os === "windows"}
+          aria-pressed={os === "windows"}
           className={`chip${os === "windows" ? " active" : ""}`}
           onClick={() => setOs("windows")}
         >

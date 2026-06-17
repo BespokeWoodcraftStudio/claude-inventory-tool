@@ -8,10 +8,10 @@ import { Trash } from "@/components/ui/icons";
 
 type Tab = "claude" | "shell" | "json";
 
-const TABS: { key: Tab; label: string; hint: string; lang: string }[] = [
-  { key: "claude", label: "Hand to Claude", hint: "Paste this into Claude Code and it removes them for you.", lang: "text" },
-  { key: "shell", label: "Shell script", hint: "Review, then run yourself. Commands are grouped by type.", lang: "bash" },
-  { key: "json", label: "JSON", hint: "Machine-readable selection for your own tooling.", lang: "json" },
+const TABS: { key: Tab; label: string; hint: string }[] = [
+  { key: "claude", label: "Hand to Claude", hint: "Paste this into Claude Code and it removes them for you." },
+  { key: "shell", label: "Shell script", hint: "Review, then run yourself. Commands are grouped by type." },
+  { key: "json", label: "JSON", hint: "Machine-readable selection for your own tooling." },
 ];
 
 function download(filename: string, text: string, mime: string) {

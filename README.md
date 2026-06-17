@@ -47,7 +47,7 @@ node claude-inventory-scan.mjs
 
 ## What it captures
 
-For every item it records the type, the scope (global or which project), a description, and a usage signal:
+For every item it records the type, the scope (global or which project), a description, and — for skills and plugins — a **real usage count**. (MCP servers and agents have no usage signal in local config, so they're shown as *passive*.)
 
 | Type | Global source | Project source |
 |------|---------------|----------------|
@@ -95,13 +95,14 @@ Deploy your own copy to Vercel (or any static-capable Next host) with one click 
 
 ## The inventory schema
 
-The scan emits, and the app reads, a single JSON shape ([`lib/types.ts`](lib/types.ts)):
+The scan emits, and the app reads, a single JSON shape — abbreviated below; the full field list is in [`lib/types.ts`](lib/types.ts):
 
 ```jsonc
 {
   "schemaVersion": 1,
   "generatedAt": "2026-…",
   "generator": "scan.mjs@1.0.0",
+  "machine": { "platform": "darwin", "node": "v22.0.0" },
   "projects": ["my-app", "my-blog"],
   "items": [
     {
@@ -111,8 +112,11 @@ The scan emits, and the app reads, a single JSON shape ([`lib/types.ts`](lib/typ
       "project": null,            // basename for project-scoped items
       "name": "graphify",
       "description": "…",
-      "usageCount": 10,
+      "path": "~/.claude/skills/graphify",
+      "usageCount": 10,           // skills & plugins only; null for mcp/agents
+      "lastUsedAt": 1718000000000,
       "usageClass": "good",       // good | warn | bad | info | unknown
+      "usageLabel": "✅ 10 uses", // display string
       "removeCmd": "rm -rf ~/.claude/skills/graphify"
     }
   ]

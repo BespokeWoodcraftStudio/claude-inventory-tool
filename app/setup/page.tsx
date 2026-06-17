@@ -121,6 +121,15 @@ export default function Setup() {
             </p>
           </div>
 
+          <p className="setup-text muted" style={{ marginTop: 14, fontSize: 13.5 }}>
+            This uses Node, which comes with Claude Code. If you ever see{" "}
+            <code className="inline">node: command not found</code> (or &ldquo;not recognized&rdquo;
+            on Windows), close and reopen the terminal — or install Node from{" "}
+            <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer"
+              style={{ color: "var(--accent-soft)", textDecoration: "underline" }}>nodejs.org</a>{" "}
+            — then paste the line again.
+          </p>
+
           {/* cautious two-step alternative */}
           <details className="setup-details">
             <summary>
@@ -147,8 +156,9 @@ export default function Setup() {
             When the command finishes, the terminal prints a line like{" "}
             <code className="inline">✓ wrote claude-inventory.json</code> with the exact location.
             The file is named <code className="inline">claude-inventory.json</code> and it&apos;s
-            saved in the folder the terminal was pointing at — usually your home folder (the one with
-            your name on it).
+            saved in whatever folder the terminal was pointing at — for a terminal you just opened,
+            that&apos;s your home folder (the one with your name on it). Trust the printed{" "}
+            <code className="inline">✓</code> path over guessing.
           </p>
           <div
             className="row gap-2"
