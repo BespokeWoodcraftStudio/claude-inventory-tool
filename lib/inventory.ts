@@ -33,6 +33,33 @@ function asString(v: unknown): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
+/**
+ * Collapse items that share an identical `path` — the same physical file scanned
+ * twice. This happens when an older scan registered $HOME as a "project": every
+ * global skill/agent gets re-listed under a phantom project (named after the
+ * username) whose `.claude` IS the global one, with the exact same path. Keep one
+ * item per path, preferring the global-scoped copy. Items without a path (e.g.
+ * MCP servers) are left untouched. Distinct installs never share a path, so this
+ * only ever removes true duplicates. The scanner stopped producing these in
+ * scan.mjs@1.1.2; this keeps already-generated files correct too.
+ */
+function dedupeByPath(items: InventoryItem[]): InventoryItem[] {
+  const winner = new Map<string, InventoryItem>();
+  for (const it of items) {
+    if (!it.path) continue;
+    const cur = winner.get(it.path);
+    if (!cur || (cur.scope !== "global" && it.scope === "global")) winner.set(it.path, it);
+  }
+  const taken = new Set<string>();
+  return items.filter((it) => {
+    if (!it.path) return true;                     // no path → can't be a path-duplicate
+    if (winner.get(it.path) !== it) return false;  // a different copy won this path
+    if (taken.has(it.path)) return false;          // safety: one per path
+    taken.add(it.path);
+    return true;
+  });
+}
+
 /** Validate + normalize an unknown blob (parsed from an uploaded file or paste). */
 export function parseInventory(raw: unknown): Inventory {
   if (!raw || typeof raw !== "object") {
@@ -45,7 +72,7 @@ export function parseInventory(raw: unknown): Inventory {
     );
   }
 
-  const items: InventoryItem[] = [];
+  const rawItems: InventoryItem[] = [];
   obj.items.forEach((it, i) => {
     if (!it || typeof it !== "object") return;
     const r = it as Record<string, unknown>;
@@ -63,7 +90,7 @@ export function parseInventory(raw: unknown): Inventory {
     ) ? (r.usageSource as UsageSource) : undefined;
 
     const source = asString(r.source);
-    items.push({
+    rawItems.push({
       id: asString(r.id) || `${type}:${scope === "global" ? "global" : "project:" + project}:${name}`,
       type, scope, project, name,
       description: asString(r.description) || "",
@@ -82,6 +109,10 @@ export function parseInventory(raw: unknown): Inventory {
       removeCmd: asString(r.removeCmd) || deriveRemoveCmd({ type, scope, project, name, source } as InventoryItem),
     });
   });
+
+  // Drop exact path-duplicates (e.g. from an older scan that registered $HOME as
+  // a phantom project). Keeps already-uploaded files correct, not just new scans.
+  const items = dedupeByPath(rawItems);
 
   if (!items.length) {
     throw new InventoryError("The file parsed, but it has no recognizable items.");

@@ -36,7 +36,7 @@ import readline from "node:readline";
 import { pathToFileURL } from "node:url";
 
 const SCHEMA_VERSION = 1;
-const GENERATOR = "scan.mjs@1.1.0";
+const GENERATOR = "scan.mjs@1.1.2";
 const HOME = os.homedir();
 const CLAUDE = path.join(HOME, ".claude");
 
@@ -500,6 +500,13 @@ export async function buildInventory(opts = {}) {
 
   for (const projPath of projectPaths) {
     if (!exists(projPath)) continue; // path may be stale
+    // The home directory's .claude IS the global scope. If a project path points
+    // at $HOME (the scan was run from there, or $HOME is registered in
+    // ~/.claude.json's projects), its .claude/skills are the SAME files already
+    // counted as global — scanning it as a "project" would duplicate every global
+    // skill, agent, and MCP server (showing up as a phantom project named after
+    // your username). Skip it.
+    if (path.resolve(path.join(projPath, ".claude")) === path.resolve(CLAUDE)) continue;
     const project = path.basename(projPath);
     const projConf = (root.projects && root.projects[projPath]) || {};
 

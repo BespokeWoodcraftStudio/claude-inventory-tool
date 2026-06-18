@@ -18,6 +18,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-06-17
+
+### Fixed
+
+- **Duplicate "phantom project" named after your username.** When `$HOME` was in
+  `~/.claude.json`'s project list (or the scan ran from your home directory), the
+  scanner treated `~/.claude` as both the global scope *and* a project, re-listing
+  every global skill and agent under a project named after your username. The
+  scanner now skips any project whose `.claude` is the global one. The web app
+  also defensively collapses items that share an identical `path`, so files from
+  an older scanner render correctly on reload without a re-scan. No `schemaVersion`
+  change.
+
 ## [1.1.1] - 2026-06-17
 
 ### Fixed
