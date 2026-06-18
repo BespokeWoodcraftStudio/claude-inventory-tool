@@ -18,10 +18,10 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          backgroundColor: "#141210",
+          backgroundColor: "#faf7f1",
           backgroundImage:
-            "radial-gradient(900px 520px at 50% -12%, rgba(217,119,87,0.20), transparent 60%), radial-gradient(720px 440px at 100% 0%, rgba(199,155,240,0.12), transparent 55%)",
-          color: "#f4efe8",
+            "radial-gradient(900px 520px at 50% -12%, rgba(193,90,51,0.12), transparent 60%), radial-gradient(720px 440px at 100% 0%, rgba(122,79,192,0.07), transparent 55%)",
+          color: "#28231d",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
@@ -33,7 +33,7 @@ export default function OpengraphImage() {
               fontSize: 25,
               letterSpacing: 4,
               textTransform: "uppercase",
-              color: "#e69a80",
+              color: "#b04e2a",
               fontWeight: 700,
             }}
           >
@@ -45,18 +45,18 @@ export default function OpengraphImage() {
           <div style={{ display: "flex", fontSize: 90, fontWeight: 800, letterSpacing: -3, lineHeight: 1.02 }}>
             Claude Inventory Tool
           </div>
-          <div style={{ display: "flex", fontSize: 37, color: "#d8cfc4", lineHeight: 1.32, maxWidth: 1000 }}>
+          <div style={{ display: "flex", fontSize: 37, color: "#5a5247", lineHeight: 1.32, maxWidth: 1000 }}>
             See, organize, and clean up your Claude skills, plugins, MCP servers &amp; agents — split by global vs. project.
           </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", gap: 14 }}>
-            <Pill label="Global" color="#c79bf0" />
-            <Pill label="Project" color="#6fc7c0" />
-            <Pill label="Real usage" color="#74c47a" />
+            <Pill label="Global" color="#7a4fc0" />
+            <Pill label="Project" color="#2f8a82" />
+            <Pill label="Real usage" color="#3f8f46" />
           </div>
-          <div style={{ display: "flex", fontSize: 27, color: "#e69a80" }}>claude-inventory-tool.vercel.app</div>
+          <div style={{ display: "flex", fontSize: 27, color: "#b04e2a" }}>claude-inventory-tool.vercel.app</div>
         </div>
       </div>
     ),

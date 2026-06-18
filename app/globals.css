@@ -1,53 +1,54 @@
 /* =============================================================
    Claude Inventory Tool — design system
-   Warm charcoal base · Claude-clay accent · crisp dev-tool surfaces.
-   Class vocabulary is shared across the landing, setup, and inventory
-   pages — keep names stable.
+   Warm ivory canvas · white surfaces · Claude-clay accent · Geist type.
+   Light, clean, dev-tool surfaces. Class vocabulary is shared across the
+   landing, setup, and inventory pages — keep names stable.
    ============================================================= */
 
 :root {
-  /* surfaces (warm near-black) */
-  --bg:        #141210;
-  --bg-2:      #191613;
-  --panel:     #1d1915;
-  --panel-2:   #241f1a;
-  --elev:      #2a241e;
-  --line:      #322b24;
-  --line-2:    #3d352c;
+  /* surfaces — warm ivory canvas, white panels */
+  --bg:        #faf7f1;
+  --bg-2:      #f3efe6;
+  --panel:     #ffffff;
+  --panel-2:   #f8f5ee;
+  --elev:      #efe9dd;
+  --line:      #ece5d8;
+  --line-2:    #ddd3c2;
 
-  /* ink */
-  --fg:        #f4efe8;
-  --fg-soft:   #d8cfc4;
-  --dim:       #a99a8b;
-  --faint:     #908475; /* lightened to clear WCAG AA on panel surfaces */
+  /* ink — warm near-black (all AA on ivory/white) */
+  --fg:        #28231d;
+  --fg-soft:   #443d34;
+  --dim:       #6a6052;
+  --faint:     #7a6f5d;
 
-  /* clay accent (Claude) */
-  --accent:        #d97757;
-  --accent-soft:   #e69a80;
-  --accent-ink:    #1a0f0a;
-  --accent-tint:   rgba(217, 119, 87, 0.13);
-  --accent-line:   rgba(217, 119, 87, 0.40);
+  /* clay accent (Claude) — deepened so white-on-coral and coral-on-ivory both pass AA */
+  --accent:        #c15a33;
+  --accent-soft:   #b04e2a;
+  --accent-ink:    #ffffff;
+  --accent-tint:   rgba(193, 90, 51, 0.10);
+  --accent-line:   rgba(193, 90, 51, 0.34);
 
-  /* functional tones */
-  --good:   #74c47a;   --good-tint:  rgba(116, 196, 122, 0.13);
-  --warn:   #e0a657;   --warn-tint:  rgba(224, 166, 87, 0.13);
-  --bad:    #e26b62;   --bad-tint:   rgba(226, 107, 98, 0.13);
-  --info:   #71a0db;   --info-tint:  rgba(113, 160, 219, 0.13);
-  --muted:  #8d8174;   --muted-tint: rgba(141, 129, 116, 0.13);
+  /* functional tones — deepened for AA on light tints */
+  --good:   #3f8f46;   --good-tint:  rgba(63, 143, 70, 0.12);
+  --warn:   #9a6a14;   --warn-tint:  rgba(154, 106, 20, 0.13);
+  --bad:    #c33a2d;   --bad-tint:   rgba(195, 58, 45, 0.11);
+  --info:   #2f6fb0;   --info-tint:  rgba(47, 111, 176, 0.11);
+  --muted:  #6a6052;   --muted-tint: rgba(106, 96, 82, 0.10);
 
   /* scope coding */
-  --global:  #c79bf0;  --global-tint:  rgba(199, 155, 240, 0.13);
-  --project: #6fc7c0;  --project-tint: rgba(111, 199, 192, 0.13);
+  --global:  #7a4fc0;  --global-tint:  rgba(122, 79, 192, 0.11);
+  --project: #2f8a82;  --project-tint: rgba(47, 138, 130, 0.12);
 
   --radius:    14px;
   --radius-sm: 9px;
   --radius-lg: 20px;
 
-  --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.28);
-  --shadow-lg: 0 2px 6px rgba(0,0,0,.45), 0 24px 60px rgba(0,0,0,.45);
+  /* soft, warm-tinted shadows — no heavy black */
+  --shadow:    0 1px 2px rgba(60,42,28,.05), 0 6px 18px rgba(60,42,28,.07);
+  --shadow-lg: 0 2px 8px rgba(60,42,28,.08), 0 22px 50px rgba(60,42,28,.13);
 
-  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: var(--font-geist-mono), ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
   --maxw: 1180px;
 }
@@ -66,8 +67,8 @@ html, body {
 }
 body {
   background:
-    radial-gradient(1100px 620px at 50% -8%, rgba(217,119,87,.07), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(199,155,240,.045), transparent 55%),
+    radial-gradient(1100px 620px at 50% -8%, rgba(193,90,51,.06), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%, rgba(122,79,192,.035), transparent 55%),
     var(--bg);
   min-height: 100dvh;
 }
@@ -105,8 +106,8 @@ p { margin: 0; }
 .brand .glyph {
   width: 28px; height: 28px; border-radius: 8px; flex: none;
   display: grid; place-items: center;
-  background: linear-gradient(150deg, var(--accent), #b85a3d);
-  color: var(--accent-ink); box-shadow: var(--shadow);
+  background: linear-gradient(150deg, var(--accent), #9c441f);
+  color: #1a0f0a; box-shadow: var(--shadow);
 }
 .nav-links { display: flex; align-items: center; gap: 4px; }
 .nav-link { padding: 7px 12px; border-radius: var(--radius-sm); color: var(--dim); font-size: 14px; font-weight: 500; transition: .15s; }
@@ -182,15 +183,25 @@ code.inline {
 }
 
 /* ---------- code block ---------- */
+/* A warm-dark terminal sitting on the light page — adds depth and reads as
+   "a real command". Has its own light-on-dark colors, independent of tokens. */
 .codeblock {
-  position: relative; background: #0d0b09; border: 1px solid var(--line);
+  position: relative; background: #221d18; border: 1px solid #322a22;
   border-radius: var(--radius-sm); padding: 14px 16px;
   font-family: var(--mono); font-size: 13px; line-height: 1.65;
-  color: var(--fg-soft); overflow-x: auto; white-space: pre;
+  color: #ece4d7; overflow-x: auto; white-space: pre;
+  box-shadow: var(--shadow);
 }
+.codeblock code.inline,
+.codeblock .inline { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); color: #f0b59a; }
 .codeblock .copy {
   position: absolute; top: 9px; right: 9px;
 }
+/* copy control sits on the dark block — keep it readable */
+.codeblock .copy .btn,
+.codeblock .copy button { color: #d8cfc0; }
+.codeblock .copy .btn:hover,
+.codeblock .copy button:hover { color: #fff; background: rgba(255,255,255,.08); }
 
 /* ---------- inputs ---------- */
 .input {

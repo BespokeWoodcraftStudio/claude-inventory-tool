@@ -23,14 +23,14 @@
     "scan": "node public/scan.mjs"
   },
   "comment:deps": "The published package is the CLI (bin/cli.mjs + public/scan.mjs), which uses only Node built-ins — so it has no runtime dependencies and `npx claude-inventory-tool` installs nothing extra. next/react/react-dom power the web app and are dev/build-only (Vercel installs devDependencies during the build).",
-  "dependencies": {},
   "devDependencies": {
-    "next": "^15.5.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "geist": "^1.7.2",
+    "next": "^15.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "typescript": "^5.7.0"
   }
 }

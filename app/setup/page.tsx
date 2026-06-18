@@ -337,7 +337,7 @@ export default function Setup() {
           font-weight: 680;
           font-variant-numeric: tabular-nums;
           color: var(--accent-ink);
-          background: linear-gradient(150deg, var(--accent), #b85a3d);
+          background: linear-gradient(150deg, var(--accent), #9c441f);
           box-shadow: var(--shadow);
           flex: none;
         }
