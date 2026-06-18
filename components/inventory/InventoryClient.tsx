@@ -107,6 +107,8 @@ export function InventoryClient() {
         </div>
       </div>
 
+      <PrivacyBanner />
+
       {isDemo && !showUpload && (
         <div className="card card-2 row between wrap gap-3" style={{ borderColor: "var(--accent-line)", marginBottom: 18 }}>
           <div className="row gap-2">
@@ -392,6 +394,41 @@ function ItemRow({ item, checked, onToggle }: { item: InventoryItem; checked: bo
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Prominent, reassuring privacy strip shown at the top of the inventory — right
+ * where people first see their own skills / MCP servers / agents and might worry
+ * the data was uploaded somewhere public. Answers that fear up front: it's local,
+ * browser-only, never sent to a server, and invisible to anyone else.
+ */
+function PrivacyBanner() {
+  return (
+    <div
+      className="row gap-2 wrap"
+      role="note"
+      style={{
+        marginBottom: 16,
+        padding: "11px 14px",
+        borderRadius: "var(--radius-sm)",
+        background: "var(--good-tint)",
+        border: "1px solid color-mix(in srgb, var(--good) 24%, transparent)",
+        alignItems: "flex-start",
+      }}
+    >
+      <span style={{ color: "var(--good)", display: "flex", marginTop: 1, flex: "none" }}>
+        <Shield size={16} />
+      </span>
+      <span style={{ fontSize: 13, lineHeight: 1.55, minWidth: 0 }}>
+        <strong style={{ color: "var(--fg)" }}>Private to this browser.</strong>{" "}
+        <span className="muted">
+          Your inventory is read on your own machine and saved only in this browser
+          (localStorage). Nothing is uploaded to a server, and no one else can see it.
+          Open this site on another device and you&apos;ll see only the demo, never your data.
+        </span>
+      </span>
     </div>
   );
 }
