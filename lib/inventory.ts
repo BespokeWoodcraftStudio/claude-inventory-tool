@@ -34,27 +34,63 @@ function asString(v: unknown): string | undefined {
 }
 
 /**
- * Collapse items that share an identical `path` — the same physical file scanned
- * twice. This happens when an older scan registered $HOME as a "project": every
- * global skill/agent gets re-listed under a phantom project (named after the
- * username) whose `.claude` IS the global one, with the exact same path. Keep one
- * item per path, preferring the global-scoped copy. Items without a path (e.g.
- * MCP servers) are left untouched. Distinct installs never share a path, so this
- * only ever removes true duplicates. The scanner stopped producing these in
- * scan.mjs@1.1.2; this keeps already-generated files correct too.
+ * Remove the artifacts of an older scan that treated $HOME as a "project".
+ * When $HOME was registered in ~/.claude.json's projects (or the scan ran from
+ * $HOME), the home dir's `.claude` — which IS the global scope — got scanned as
+ * a project named after the username, re-listing global skills, agents, AND its
+ * project-scoped MCP servers.
+ *
+ * Two passes:
+ *  1. Drop any project that is a "shadow of global" — it has at least one
+ *     path-bearing item and EVERY path-bearing item points at a file already
+ *     listed under global (i.e. its `.claude` is the global one). The whole
+ *     phantom project is removed, including pathless items like MCP servers that
+ *     a path-only de-dup would miss.
+ *  2. Fallback: collapse any remaining items that share an identical `path`,
+ *     preferring the global copy.
+ *
+ * A real project's files live under its own repo path, never under ~/.claude, so
+ * legitimate projects are never touched (a same-named skill at a different path
+ * is kept). Fixed at the source in scan.mjs@1.1.2; this keeps already-generated
+ * files correct on reload too.
  */
-function dedupeByPath(items: InventoryItem[]): InventoryItem[] {
-  const winner = new Map<string, InventoryItem>();
+function collapseScanDuplicates(items: InventoryItem[]): InventoryItem[] {
+  const globalPaths = new Set(
+    items.filter((i) => i.scope === "global" && i.path).map((i) => i.path as string),
+  );
+
+  // Group project items by project name, then flag projects whose every
+  // path-bearing item is actually a global file (the phantom $HOME project).
+  const projectItems = new Map<string, InventoryItem[]>();
   for (const it of items) {
+    if (it.scope !== "project") continue;
+    const key = it.project || "unknown";
+    const arr = projectItems.get(key);
+    if (arr) arr.push(it); else projectItems.set(key, [it]);
+  }
+  const shadowProjects = new Set<string>();
+  for (const [proj, its] of projectItems) {
+    const pathed = its.filter((i) => i.path);
+    if (pathed.length > 0 && pathed.every((i) => globalPaths.has(i.path as string))) {
+      shadowProjects.add(proj);
+    }
+  }
+  const pruned = items.filter(
+    (it) => !(it.scope === "project" && shadowProjects.has(it.project || "unknown")),
+  );
+
+  // Fallback: collapse any remaining exact path-duplicates, preferring global.
+  const winner = new Map<string, InventoryItem>();
+  for (const it of pruned) {
     if (!it.path) continue;
     const cur = winner.get(it.path);
     if (!cur || (cur.scope !== "global" && it.scope === "global")) winner.set(it.path, it);
   }
   const taken = new Set<string>();
-  return items.filter((it) => {
-    if (!it.path) return true;                     // no path → can't be a path-duplicate
-    if (winner.get(it.path) !== it) return false;  // a different copy won this path
-    if (taken.has(it.path)) return false;          // safety: one per path
+  return pruned.filter((it) => {
+    if (!it.path) return true;
+    if (winner.get(it.path) !== it) return false;
+    if (taken.has(it.path)) return false;
     taken.add(it.path);
     return true;
   });
@@ -110,9 +146,10 @@ export function parseInventory(raw: unknown): Inventory {
     });
   });
 
-  // Drop exact path-duplicates (e.g. from an older scan that registered $HOME as
-  // a phantom project). Keeps already-uploaded files correct, not just new scans.
-  const items = dedupeByPath(rawItems);
+  // Remove duplicates from an older scan that registered $HOME as a phantom
+  // project (drops the whole shadow-of-global project, MCP servers included).
+  // Keeps already-uploaded files correct on reload, not just fresh scans.
+  const items = collapseScanDuplicates(rawItems);
 
   if (!items.length) {
     throw new InventoryError("The file parsed, but it has no recognizable items.");

@@ -27,9 +27,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   scanner treated `~/.claude` as both the global scope *and* a project, re-listing
   every global skill and agent under a project named after your username. The
   scanner now skips any project whose `.claude` is the global one. The web app
-  also defensively collapses items that share an identical `path`, so files from
-  an older scanner render correctly on reload without a re-scan. No `schemaVersion`
-  change.
+  also defensively drops the phantom project on load: any project whose files all
+  live under `~/.claude` is really the global scope wearing a project hat, so it is
+  removed entirely (MCP servers included, not just path-duplicated skills). Files
+  from an older scanner render correctly on reload without a re-scan. No
+  `schemaVersion` change.
 
 ## [1.1.1] - 2026-06-17
 
