@@ -139,16 +139,18 @@ export function InventoryClient() {
             ? `${items.length} items`
             : `${filtered.length} of ${items.length} items`}
         </div>
-        {filtered.length > 0 && (
+        {(redundant.length > 0 || filtered.length > 0 || selected.size > 0) && (
           <div className="row gap-2">
             {redundant.length > 0 && (
               <button className="btn btn-ghost btn-sm" onClick={() => selectMany(redundant, true)}>
                 Select {redundant.length} redundant {redundant.length === 1 ? "copy" : "copies"}
               </button>
             )}
-            <button className="btn btn-ghost btn-sm" onClick={() => selectMany(filtered.filter((i) => i.usageClass === "bad" || i.usageClass === "warn").map((i) => i.id), true)}>
-              Select unused in view
-            </button>
+            {filtered.length > 0 && (
+              <button className="btn btn-ghost btn-sm" onClick={() => selectMany(filtered.filter((i) => i.usageClass === "bad" || i.usageClass === "warn").map((i) => i.id), true)}>
+                Select unused in view
+              </button>
+            )}
             {selected.size > 0 && <button className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>Clear all</button>}
           </div>
         )}
