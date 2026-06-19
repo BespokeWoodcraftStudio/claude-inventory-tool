@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Claude Inventory Tool are recorded here.
+All notable changes to Stack Cleaner are recorded here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -13,10 +13,22 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 >   replaced with `<redacted>` or rewritten to `~`. Read these before you run the
 >   scan again.
 > - **Schema changes** (a `schemaVersion` bump in `lib/types.ts`) — anything that
->   changes the shape of `claude-inventory.json`. Read these before you drop an
+>   changes the shape of `stack-cleaner.json`. Read these before you drop an
 >   older file into a newer app, or a newer file into an older one.
 
 ## [Unreleased]
+
+## [1.1.5] - 2026-06-18
+
+### Changed
+
+- **Rebranded to Stack Cleaner.** The product, the npm package (now `stack-cleaner`,
+  run with `npx stack-cleaner@latest`), the GitHub repository, and the site
+  (**https://stackcleaner.com**) are all renamed from "Claude Inventory Tool". The
+  tool's function is unchanged: it still scans and cleans up your Claude Code setup.
+  The old npm package `claude-inventory-tool` is deprecated and points here. The scan
+  output file is now `stack-cleaner.json` (the web app accepts any filename, so files
+  produced by older versions still load fine).
 
 ## [1.1.4] - 2026-06-18
 
@@ -87,7 +99,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Fixed
 
 - The published npm package no longer declares `next` / `react` / `react-dom` as
-  runtime dependencies, so `npx claude-inventory-tool` installs nothing beyond the
+  runtime dependencies, so `npx stack-cleaner` installs nothing beyond the
   zero-dependency scanner (it uses only Node built-ins). Those packages power the
   web app and are now dev/build-only; Vercel still installs them during the build.
 
@@ -99,8 +111,8 @@ older app still reads the new fields (they're all optional and additive).
 
 ### Added
 
-- **An `npx` entry point for the scanner.** Run `npx claude-inventory-tool`
-  (or `npm i -g claude-inventory-tool` then `claude-inventory-tool`) to scan with
+- **An `npx` entry point for the scanner.** Run `npx stack-cleaner`
+  (or `npm i -g stack-cleaner` then `stack-cleaner`) to scan with
   one command — identical on macOS, Windows, and Linux, with no `curl … | node`
   pipe. It runs the same `scan.mjs`, just delivered through npm; the curl
   one-liners stay as the read-it-first / no-npm alternatives. New flags carried
@@ -162,7 +174,7 @@ Initial public release.
 
 - **The scanner** (`public/scan.mjs`) — a zero-dependency Node script (`node:`
   built-ins only) that reads a local Claude Code install and writes
-  `claude-inventory.json`. It enumerates **every project** Claude Code knows
+  `stack-cleaner.json`. It enumerates **every project** Claude Code knows
   about from `~/.claude.json` (not just the current folder), and captures:
   - **Skills** from `SKILL.md` frontmatter (global and per-project),
   - **Agents** from `*.md` files (global and per-project),
@@ -175,7 +187,7 @@ Initial public release.
 
 - **The inventory web app** — a Next.js 15 (App Router) + TypeScript app with a
   plain-CSS design system, no backend and no database. You drop your
-  `claude-inventory.json` in; it's parsed **in your browser** and stored only in
+  `stack-cleaner.json` in; it's parsed **in your browser** and stored only in
   `localStorage` — never uploaded. It groups everything by **global vs. project**,
   shows the real usage counts, and offers filters to find dead weight.
 
@@ -201,5 +213,5 @@ Initial public release.
 - **The scan only reads.** It makes no network request and never installs,
   modifies, or removes anything.
 
-[Unreleased]: https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/releases/tag/v1.0.0
+[Unreleased]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/releases/tag/v1.0.0

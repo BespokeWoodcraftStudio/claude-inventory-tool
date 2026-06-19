@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { MARK_DATA_URI } from "@/lib/og-mark";
 
-export const alt = "Claude Inventory Tool: see, organize, and clean up your Claude setup";
+export const alt = "Stack Cleaner: see, organize, and clean up your Claude setup";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -43,7 +43,7 @@ export default function OpengraphImage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ display: "flex", fontSize: 90, fontWeight: 800, letterSpacing: -3, lineHeight: 1.02 }}>
-            Claude Inventory Tool
+            Stack Cleaner
           </div>
           <div style={{ display: "flex", fontSize: 37, color: "#5a5247", lineHeight: 1.32, maxWidth: 1000 }}>
             See, organize, and clean up your Claude skills, plugins, MCP servers &amp; agents, split by global vs. project.
@@ -56,7 +56,7 @@ export default function OpengraphImage() {
             <Pill label="Project" color="#2f8a82" />
             <Pill label="Real usage" color="#3f8f46" />
           </div>
-          <div style={{ display: "flex", fontSize: 27, color: "#b04e2a" }}>claude-inventory-tool.vercel.app</div>
+          <div style={{ display: "flex", fontSize: 27, color: "#b04e2a" }}>stackcleaner.com</div>
         </div>
       </div>
     ),

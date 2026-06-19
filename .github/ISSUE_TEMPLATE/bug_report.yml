@@ -8,8 +8,8 @@ body:
         Thanks for taking the time to file a bug.
 
         **Before you post:** if you think a real secret, token, or absolute `/Users/<name>/` path
-        ended up in `claude-inventory.json` (a redaction failure), **do not file it here.** That is a
-        security issue. Report it privately — see [SECURITY.md](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/blob/main/SECURITY.md).
+        ended up in `stack-cleaner.json` (a redaction failure), **do not file it here.** That is a
+        security issue. Report it privately — see [SECURITY.md](https://github.com/BespokeWoodcraftStudio/stack-cleaner/blob/main/SECURITY.md).
         Public issues are world-readable forever.
 
         For everything else, the more detail you give, the faster we can help.
@@ -30,7 +30,7 @@ body:
       description: A numbered list is ideal. Include the exact command you ran, if any.
       placeholder: |
         1. Ran `node public/scan.mjs`
-        2. Dropped claude-inventory.json into the web app
+        2. Dropped stack-cleaner.json into the web app
         3. ...
     validations:
       required: true
@@ -56,7 +56,7 @@ body:
     id: generator
     attributes:
       label: scan.mjs version
-      description: The `generator` field from your claude-inventory.json (for example, `scan.mjs@1.0.0`).
+      description: The `generator` field from your stack-cleaner.json (for example, `scan.mjs@1.0.0`).
       placeholder: scan.mjs@1.0.0
     validations:
       required: false

@@ -1,10 +1,10 @@
 // Shared constants for the scan flow. If the deploy URL changes, update here.
-export const SITE_URL = "https://claude-inventory-tool.vercel.app";
+export const SITE_URL = "https://stackcleaner.com";
 
 export type Os = "mac" | "windows";
 
 /**
- * The command(s) users run to produce claude-inventory.json, per platform.
+ * The command(s) users run to produce stack-cleaner.json, per platform.
  *
  * macOS / Linux uses bash/zsh, where `curl … | node` pipes cleanly.
  * Windows uses PowerShell, where `curl` is an alias for Invoke-WebRequest and
@@ -16,12 +16,12 @@ export const SCAN_COMMANDS: Record<Os, { label: string; oneLiner: string; twoSte
   mac: {
     label: "macOS / Linux",
     oneLiner: `curl -fsSL ${SITE_URL}/scan.mjs | node`,
-    twoStep: `curl -fsSL ${SITE_URL}/scan.mjs -o claude-inventory-scan.mjs\nnode claude-inventory-scan.mjs`,
+    twoStep: `curl -fsSL ${SITE_URL}/scan.mjs -o stack-cleaner-scan.mjs\nnode stack-cleaner-scan.mjs`,
   },
   windows: {
     label: "Windows (PowerShell)",
-    oneLiner: `curl.exe -fsSL ${SITE_URL}/scan.mjs -o claude-inventory-scan.mjs; node claude-inventory-scan.mjs`,
-    twoStep: `curl.exe -fsSL ${SITE_URL}/scan.mjs -o claude-inventory-scan.mjs\nnode claude-inventory-scan.mjs`,
+    oneLiner: `curl.exe -fsSL ${SITE_URL}/scan.mjs -o stack-cleaner-scan.mjs; node stack-cleaner-scan.mjs`,
+    twoStep: `curl.exe -fsSL ${SITE_URL}/scan.mjs -o stack-cleaner-scan.mjs\nnode stack-cleaner-scan.mjs`,
   },
 };
 
@@ -37,4 +37,4 @@ export const SCAN_TWO_STEP = SCAN_COMMANDS.mac.twoStep;
  * already installs. This is the recommended path; the curl one-liners above stay
  * as the read-it-first / no-npm alternatives.
  */
-export const SCAN_NPX = "npx claude-inventory-tool@latest";
+export const SCAN_NPX = "npx stack-cleaner@latest";

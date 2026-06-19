@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-// claude-inventory-tool — npx CLI
+// stack-cleaner — npx CLI
 //
 // Scans your local Claude Code setup (skills, plugins, MCP servers, agents)
-// plus transcript usage, and writes a redacted claude-inventory.json you can
-// upload to https://claude-inventory-tool.vercel.app to explore + clean up.
+// plus transcript usage, and writes a redacted stack-cleaner.json you can
+// upload to https://stackcleaner.com to explore + clean up.
 //
-//   npx claude-inventory-tool
-//   npx claude-inventory-tool --stdout
-//   npx claude-inventory-tool --out my-inventory.json
+//   npx stack-cleaner
+//   npx stack-cleaner --stdout
+//   npx stack-cleaner --out my-inventory.json
 //
 // Privacy: only tool/server/agent/skill NAMES, counts, and timestamps are
 // extracted from transcripts. No prompt text, args, paths, or commands.
@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { runScan } from "../public/scan.mjs";
 
-const UPLOAD_URL = "https://claude-inventory-tool.vercel.app";
+const UPLOAD_URL = "https://stackcleaner.com";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function readVersion() {
@@ -33,29 +33,29 @@ function readVersion() {
 function printHelp() {
   const v = readVersion();
   process.stdout.write(
-    `claude-inventory-tool v${v}
+    `stack-cleaner v${v}
 
 Scan your local Claude Code setup (skills, plugins, MCP servers, agents) and
-transcript usage into a redacted claude-inventory.json. Then upload it to
+transcript usage into a redacted stack-cleaner.json. Then upload it to
 ${UPLOAD_URL} to explore and clean up what you're not using.
 
 Usage:
-  npx claude-inventory-tool [options]
+  npx stack-cleaner [options]
 
 Options:
   -h, --help               Show this help and exit.
   -v, --version            Print the version and exit.
       --stdout, --print    Print the inventory JSON to stdout instead of writing a file.
-      --out <file>         Write the inventory to <file> (default: claude-inventory.json).
+      --out <file>         Write the inventory to <file> (default: stack-cleaner.json).
       --no-transcripts     Skip transcript usage scanning (faster; no usage counts).
       --transcripts-dir <dir>
                            Scan transcripts from <dir> instead of ~/.claude/projects.
 
 Examples:
-  npx claude-inventory-tool
-  npx claude-inventory-tool --stdout > inventory.json
-  npx claude-inventory-tool --out ~/Desktop/inventory.json
-  npx claude-inventory-tool --no-transcripts
+  npx stack-cleaner
+  npx stack-cleaner --stdout > inventory.json
+  npx stack-cleaner --out ~/Desktop/inventory.json
+  npx stack-cleaner --no-transcripts
 
 Privacy: only tool/server/agent/skill names, counts, and timestamps are read
 from transcripts — never prompt text, arguments, file paths, or commands.
@@ -70,7 +70,7 @@ function parseArgs(argv) {
     help: false,
     version: false,
     stdout: false,
-    outFile: "claude-inventory.json",
+    outFile: "stack-cleaner.json",
     transcripts: true,
     transcriptsDir: undefined,
   };
@@ -130,7 +130,7 @@ async function main() {
     opts = parseArgs(process.argv.slice(2));
   } catch (err) {
     process.stderr.write(`Error: ${err.message}\n\n`);
-    process.stderr.write(`Run \`claude-inventory-tool --help\` for usage.\n`);
+    process.stderr.write(`Run \`stack-cleaner --help\` for usage.\n`);
     process.exit(1);
     return;
   }
@@ -147,7 +147,7 @@ async function main() {
 
   // Friendly banner — keep it on stderr so `--stdout` stays pure JSON on stdout.
   if (!opts.stdout) {
-    process.stderr.write(`claude-inventory-tool v${readVersion()}\n`);
+    process.stderr.write(`stack-cleaner v${readVersion()}\n`);
     process.stderr.write(`Scanning your Claude Code setup...\n`);
   }
 

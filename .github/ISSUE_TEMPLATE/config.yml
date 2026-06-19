@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Report a security / secret-leak issue
-    url: https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/blob/main/SECURITY.md
-    about: Found a real secret, token, or /Users/ path in claude-inventory.json, or another security concern? Report it privately. Do not open a public issue.
+    url: https://github.com/BespokeWoodcraftStudio/stack-cleaner/blob/main/SECURITY.md
+    about: Found a real secret, token, or /Users/ path in stack-cleaner.json, or another security concern? Report it privately. Do not open a public issue.
   - name: Questions & help
-    url: https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/blob/main/SUPPORT.md
+    url: https://github.com/BespokeWoodcraftStudio/stack-cleaner/blob/main/SUPPORT.md
     about: Not sure if it's a bug? Need help running the scan or reading the results? Start here.

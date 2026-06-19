@@ -1,5 +1,5 @@
 // =============================================================
-// Claude Inventory Tool — shared schema
+// Stack Cleaner — shared schema
 // The scan script (public/scan.mjs) emits this exact shape, and the
 // whole UI reads it. Keep the two in sync; bump SCHEMA_VERSION on change.
 // =============================================================

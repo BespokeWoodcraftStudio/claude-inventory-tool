@@ -47,7 +47,7 @@ export function Hero() {
               <div className="row gap-1 faint lp-scan-note">
                 <Shield size={13} />
                 <span>
-                  Writes <code className="inline">claude-inventory.json</code> locally.
+                  Writes <code className="inline">stack-cleaner.json</code> locally.
                   Secrets stripped. Nothing leaves your machine.
                 </span>
               </div>
@@ -68,7 +68,7 @@ function HeroPreview() {
     <div className="lp-preview hide-sm" aria-hidden="true">
       <div className="card card-2 lp-preview-card">
         <div className="row between" style={{ marginBottom: 14 }}>
-          <span className="mono faint" style={{ fontSize: 12 }}>claude-inventory.json</span>
+          <span className="mono faint" style={{ fontSize: 12 }}>stack-cleaner.json</span>
           <span className="badge accent">42 items</span>
         </div>
 

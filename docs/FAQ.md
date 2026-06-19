@@ -4,7 +4,7 @@ Short answers to the questions people ask most. If something here is unclear, se
 
 ## Is anything uploaded?
 
-No. The scan runs on your machine and never makes a network request. The web app parses your `claude-inventory.json` in the browser and keeps it only in that browser's `localStorage`. Nothing is sent to a server — there is no server. Close the tab and the data stays on your machine.
+No. The scan runs on your machine and never makes a network request. The web app parses your `stack-cleaner.json` in the browser and keeps it only in that browser's `localStorage`. Nothing is sent to a server — there is no server. Close the tab and the data stays on your machine.
 
 ## What exactly does the scan read?
 
@@ -22,7 +22,7 @@ The cleanup features only **generate text** — a paste-to-Claude prompt, a shel
 
 ## Are my API keys / secrets safe?
 
-The known secret-bearing fields are redacted before `claude-inventory.json` is written:
+The known secret-bearing fields are redacted before `stack-cleaner.json` is written:
 
 - MCP `env` values
 - auth headers
@@ -35,7 +35,7 @@ There is **one caveat**: skill and agent descriptions are prose copied from thei
 
 ## Do I need a GitHub account or to know the terminal?
 
-No. The [Setup page](https://claude-inventory-tool.vercel.app/setup) is a copy-paste wizard. You copy one line, paste it into your terminal, press Enter, and drop the resulting file into the tool. No GitHub account, no coding.
+No. The [Setup page](https://stackcleaner.com/setup) is a copy-paste wizard. You copy one line, paste it into your terminal, press Enter, and drop the resulting file into the tool. No GitHub account, no coding.
 
 ## How does it know what I actually use?
 
@@ -43,7 +43,7 @@ The scan reads your local Claude Code **transcripts** — the session logs under
 
 It reads **only the names** (the tool / skill / agent / MCP-server name), the **counts**, and the **timestamps**. It never reads or records your prompts, message text, tool arguments, file paths, `cwd`, or command contents. The transcript files are streamed line by line and only those few fields are extracted.
 
-Everything stays on your machine; the counts land in `claude-inventory.json` and go nowhere until *you* choose to upload that file to the web app (which still parses it only in your browser).
+Everything stays on your machine; the counts land in `stack-cleaner.json` and go nowhere until *you* choose to upload that file to the web app (which still parses it only in your browser).
 
 Don't want the scan to look at transcripts at all? Run it with `--no-transcripts`. You'll still get the full inventory — just without the per-item invocation counts for skills, agents, and MCP servers.
 
@@ -53,13 +53,13 @@ In the folder your terminal was in when you ran the scan. The scanner prints the
 
 ## Does this work on Windows?
 
-Yes. The [Setup page](https://claude-inventory-tool.vercel.app/setup) gives you a Windows-specific command to copy. The scanner is plain Node and runs the same on Windows, macOS, and Linux.
+Yes. The [Setup page](https://stackcleaner.com/setup) gives you a Windows-specific command to copy. The scanner is plain Node and runs the same on Windows, macOS, and Linux.
 
 ## I don't trust "curl | node" — what else can I do?
 
 That's a healthy instinct. You have options, lightest-touch first:
 
-- **Use npx — no pipe, no curl.** Run `npx claude-inventory-tool@latest`. npm fetches the published, versioned package and runs it. It's the same code as `/scan.mjs`, just delivered through npm instead of a shell pipe.
+- **Use npx — no pipe, no curl.** Run `npx stack-cleaner@latest`. npm fetches the published, versioned package and runs it. It's the same code as `/scan.mjs`, just delivered through npm instead of a shell pipe.
 - **Download and read it first.** Save `scan.mjs` to disk, open it, read it (it's one short, dependency-free file), then run `node scan.mjs`.
 - **Clone the repo and run it from source.** `git clone`, then `node public/scan.mjs`.
 
@@ -71,4 +71,4 @@ No. It's a [Bespoke Woodcraft Studio](https://github.com/BespokeWoodcraftStudio)
 
 ## Is it really free / open source?
 
-Yes. It's free and open source under the MIT license. The full source is on [GitHub](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool) — read it, run it, fork it, or self-host your own copy.
+Yes. It's free and open source under the MIT license. The full source is on [GitHub](https://github.com/BespokeWoodcraftStudio/stack-cleaner) — read it, run it, fork it, or self-host your own copy.

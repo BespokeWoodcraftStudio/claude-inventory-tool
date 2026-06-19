@@ -15,11 +15,11 @@ Two ways, in order of preference:
 
 That's it. There are no other contacts. If you see an address like `security@…` somewhere, it isn't ours.
 
-## The #1 issue: a secret reached `claude-inventory.json`
+## The #1 issue: a secret reached `stack-cleaner.json`
 
 The most important thing to report is this:
 
-> The scanner wrote a **real secret**, or an absolute **`/Users/<name>/`** path, into `claude-inventory.json`.
+> The scanner wrote a **real secret**, or an absolute **`/Users/<name>/`** path, into `stack-cleaner.json`.
 
 The output file should never contain a real credential or your real home-directory path. If yours does, that's the bug we most need to fix.
 
@@ -58,7 +58,7 @@ A good report tells us enough to reproduce the miss without exposing you:
 
 **In scope:**
 
-- **Redaction misses**: a real secret or a `/Users/<name>/` path reaching `claude-inventory.json`. This is the top priority.
+- **Redaction misses**: a real secret or a `/Users/<name>/` path reaching `stack-cleaner.json`. This is the top priority.
 - **Client-side issues**: for example, XSS or other injection via a crafted inventory file that the app parses in the browser.
 - **Supply-chain trust of the `curl … | node` one-liner**: anything that could let the scan you run differ from the published, auditable `public/scan.mjs`.
 
@@ -81,9 +81,9 @@ One documented caveat: skill and agent **descriptions** are prose copied from fr
 
 To compute real usage counts, the scan reads your local Claude Code transcripts (`~/.claude/projects/*.jsonl`). This is deliberately narrow:
 
-- **Names, counts, and timestamps only.** The scanner streams each transcript line by line and extracts **only** the tool / skill / agent / MCP-server name, increments a counter, and keeps the most recent timestamp. That's all that reaches `claude-inventory.json`.
+- **Names, counts, and timestamps only.** The scanner streams each transcript line by line and extracts **only** the tool / skill / agent / MCP-server name, increments a counter, and keeps the most recent timestamp. That's all that reaches `stack-cleaner.json`.
 - **What it never reads or emits.** It does not read or record your prompts, message or response text, tool arguments, `cwd`, file paths or file contents, or `Bash` command text. None of that is parsed out of the transcript, so none of it can leak into the output.
-- **Local until you upload.** Like the rest of the scan, this happens entirely on your machine and makes no network call. The counts only leave your device if you choose to upload `claude-inventory.json` to the web app (which still parses it only in your browser).
+- **Local until you upload.** Like the rest of the scan, this happens entirely on your machine and makes no network call. The counts only leave your device if you choose to upload `stack-cleaner.json` to the web app (which still parses it only in your browser).
 - **Opt out completely.** Run the scan with **`--no-transcripts`** to skip the transcript read entirely. You'll still get the full inventory, just without per-item invocation counts.
 
 If you find the transcript pass emitting anything beyond names, counts, and timestamps, treat it as a redaction miss and report it privately using the steps above.

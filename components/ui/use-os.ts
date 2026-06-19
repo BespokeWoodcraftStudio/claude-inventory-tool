@@ -6,7 +6,7 @@ import type { Os } from "@/components/inventory/constants";
 // A tiny shared store for the user's OS choice, persisted to localStorage so it
 // stays consistent across every island that shows a scan command (the hero, the
 // setup wizard, the upload panel). Toggling in one place updates them all.
-const KEY = "cit-os";
+const KEY = "sc-os";
 let current: Os | null = null;
 const listeners = new Set<() => void>();
 

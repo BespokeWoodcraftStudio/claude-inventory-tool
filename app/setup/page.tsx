@@ -12,14 +12,14 @@ export const metadata: Metadata = {
     "A friendly, step-by-step walkthrough to load your Claude inventory in about two minutes. No coding, no GitHub, 100% local.",
   alternates: { canonical: "/setup" },
   openGraph: {
-    title: "Set up the Claude Inventory Tool in 2 minutes",
+    title: "Set up the Stack Cleaner in 2 minutes",
     description:
       "A friendly, step-by-step walkthrough to load your Claude inventory in about two minutes. No coding, no GitHub, 100% local.",
     url: "/setup",
   },
 };
 
-const GITHUB_URL = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";
+const GITHUB_URL = "https://github.com/BespokeWoodcraftStudio/stack-cleaner";
 
 /** One step in the vertical stepper. The number badge sits in its own lane so text never collides. */
 function Step({
@@ -122,7 +122,7 @@ export default function Setup() {
           <div className="card card-2" style={{ marginTop: 18, padding: "16px 18px" }}>
             <p className="setup-text" style={{ margin: 0 }}>
               <strong>What it does, plainly:</strong> it looks at your own Claude setup and
-              writes a small file called <code className="inline">claude-inventory.json</code> right
+              writes a small file called <code className="inline">stack-cleaner.json</code> right
               where the terminal is pointing. It doesn&apos;t change anything on your computer, and
               it doesn&apos;t send anything anywhere.
             </p>
@@ -158,7 +158,7 @@ export default function Setup() {
               style={{ color: "var(--accent-soft)", textDecoration: "underline" }}>nodejs.org</a>{" "}
             then paste the line again. On older Windows without{" "}
             <code className="inline">curl.exe</code>, swap the first part for{" "}
-            <code className="inline">iwr {SITE_URL}/scan.mjs -OutFile claude-inventory-scan.mjs</code>,
+            <code className="inline">iwr {SITE_URL}/scan.mjs -OutFile stack-cleaner-scan.mjs</code>,
             or just open <a href="/scan.mjs" target="_blank" rel="noopener noreferrer"
               style={{ color: "var(--accent-soft)", textDecoration: "underline" }}>/scan.mjs</a>{" "}
             in your browser, save it, and run <code className="inline">node</code> on the saved file.
@@ -171,14 +171,14 @@ export default function Setup() {
             </summary>
             <div className="setup-details-body">
               <p className="setup-text">
-                This saves the script as <code className="inline">claude-inventory-scan.mjs</code> so
+                This saves the script as <code className="inline">stack-cleaner-scan.mjs</code> so
                 you can open and read it first, then runs it as a second step. Paste both lines:
               </p>
               <div style={{ marginTop: 12 }}>
                 <ScanCommand variant="twoStep" showToggle={false} />
               </div>
               <p className="setup-text faint" style={{ marginTop: 12, marginBottom: 0 }}>
-                Running it creates the data file <code className="inline">claude-inventory.json</code>:
+                Running it creates the data file <code className="inline">stack-cleaner.json</code>:
                 that&apos;s the one you drop into the app. The result is identical to the one-liner; you
                 just get to inspect the script in between.
               </p>
@@ -190,8 +190,8 @@ export default function Setup() {
         <Step n={3} title="Find the file it made">
           <p className="setup-text">
             When the command finishes, the terminal prints a line like{" "}
-            <code className="inline">✓ wrote claude-inventory.json</code> with the exact location.
-            The file is named <code className="inline">claude-inventory.json</code> and it&apos;s
+            <code className="inline">✓ wrote stack-cleaner.json</code> with the exact location.
+            The file is named <code className="inline">stack-cleaner.json</code> and it&apos;s
             saved in whatever folder the terminal was pointing at: for a terminal you just opened,
             that&apos;s your home folder (the one with your name on it). On a Mac that&apos;s{" "}
             <code className="inline">/Users/you</code>; on Windows it&apos;s{" "}
@@ -217,7 +217,7 @@ export default function Setup() {
         <Step n={4} title="Drop it into the app">
           <p className="setup-text">
             Open the inventory page, then drag the{" "}
-            <code className="inline">claude-inventory.json</code> file onto it, or click{" "}
+            <code className="inline">stack-cleaner.json</code> file onto it, or click{" "}
             <strong>Choose file</strong> and pick it. From that moment on, everything stays inside
             your browser; nothing is uploaded.
           </p>
@@ -289,8 +289,8 @@ export default function Setup() {
               GitHub
             </a>
             . Clone the repo and run <code className="inline">node public/scan.mjs</code>, or install
-            it once with <code className="inline">npm i -g claude-inventory-tool</code> and run{" "}
-            <code className="inline">claude-inventory-tool</code>.
+            it once with <code className="inline">npm i -g stack-cleaner</code> and run{" "}
+            <code className="inline">stack-cleaner</code>.
           </p>
         </div>
 

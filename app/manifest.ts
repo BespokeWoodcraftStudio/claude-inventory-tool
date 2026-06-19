@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Claude Inventory Tool",
-    short_name: "Claude Inventory",
+    name: "Stack Cleaner",
+    short_name: "Stack Cleaner",
     description:
       "See, organize, and clean up your Claude skills, plugins, MCP servers, and agents: split by global vs. project. Runs locally, sends nothing.",
     start_url: "/",

@@ -9,8 +9,8 @@ By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 It's a standard Next.js (App Router) app: no backend, no database.
 
 ```bash
-git clone https://github.com/BespokeWoodcraftStudio/claude-inventory-tool
-cd claude-inventory-tool
+git clone https://github.com/BespokeWoodcraftStudio/stack-cleaner
+cd stack-cleaner
 npm install
 npm run dev        # http://localhost:3000
 
@@ -22,7 +22,7 @@ node public/scan.mjs        # or: npm run scan
 
 The README has the full [**Project layout**](README.md#project-layout) section. The short version, and the mental model to keep:
 
-- **`public/scan.mjs` is the engine.** It's a zero-dependency Node script (`node:` built-ins only) that runs on the user's machine, reads their Claude Code install, strips secrets, and writes `claude-inventory.json`.
+- **`public/scan.mjs` is the engine.** It's a zero-dependency Node script (`node:` built-ins only) that runs on the user's machine, reads their Claude Code install, strips secrets, and writes `stack-cleaner.json`.
 - **The web app is a pure client-side viewer.** It parses that file in the browser and stores it only in `localStorage`. There is no server, nothing is uploaded, and nothing is ever installed or removed by the tool. Cleanup features only *generate* text commands for the user to review and run.
 
 The schema that ties the two halves together lives in [`lib/types.ts`](lib/types.ts), and the parse/filter/group/export logic is in [`lib/inventory.ts`](lib/inventory.ts).
@@ -71,7 +71,7 @@ This is the line we don't cross. If your change touches `public/scan.mjs` (or an
 - **No real secrets in test fixtures or committed sample output.** If you add a fixture or example inventory, use obviously fake placeholder values, and make sure any real scan output you might paste into a PR has been run through the grep above first.
 - One documented caveat already exists: skill and agent **descriptions** are copied verbatim from frontmatter and are *not* scrubbed. If your change widens what gets copied verbatim, call it out explicitly in the PR.
 
-If you find a case where a real secret reached `claude-inventory.json`, **do not open a public issue**. See [SECURITY.md](SECURITY.md) and report it privately.
+If you find a case where a real secret reached `stack-cleaner.json`, **do not open a public issue**. See [SECURITY.md](SECURITY.md) and report it privately.
 
 ## Branch & PR etiquette
 
@@ -86,7 +86,7 @@ If your change is **user-facing** (anything someone using the tool would notice)
 
 ## Where to discuss ideas
 
-Open a [GitHub issue](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/issues) to propose or talk through an idea before you build it, especially for anything that changes the schema or the redaction rules. Not sure where to start? Read [docs/FAQ.md](docs/FAQ.md) and [docs/USAGE.md](docs/USAGE.md) first; for help using the tool, see [SUPPORT.md](SUPPORT.md).
+Open a [GitHub issue](https://github.com/BespokeWoodcraftStudio/stack-cleaner/issues) to propose or talk through an idea before you build it, especially for anything that changes the schema or the redaction rules. Not sure where to start? Read [docs/FAQ.md](docs/FAQ.md) and [docs/USAGE.md](docs/USAGE.md) first; for help using the tool, see [SUPPORT.md](SUPPORT.md).
 
 ## Good first issues
 

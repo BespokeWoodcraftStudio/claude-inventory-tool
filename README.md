@@ -1,12 +1,12 @@
 <div align="center">
 
-# Claude Inventory Tool
+# Stack Cleaner
 
 **See, organize, and clean up your Claude Code setup: every skill, plugin, MCP server, and agent, split by _global_ vs. _project_.**
 
 Free · open source · runs locally · sends nothing.
 
-[**Live app →**](https://claude-inventory-tool.vercel.app) &nbsp;·&nbsp; [Guided setup →](https://claude-inventory-tool.vercel.app/setup) &nbsp;·&nbsp; [Try the demo →](https://claude-inventory-tool.vercel.app/inventory)
+[**Live app →**](https://stackcleaner.com) &nbsp;·&nbsp; [Guided setup →](https://stackcleaner.com/setup) &nbsp;·&nbsp; [Try the demo →](https://stackcleaner.com/inventory)
 
 </div>
 
@@ -26,8 +26,8 @@ This tool answers them. You run one command, it reads your local Claude Code ins
   └─────────────┘      └──────────────────────┘      └─────────────────────┘
 ```
 
-1. **Scan**: run the one-liner below. It writes `claude-inventory.json` next to you. No dependencies, nothing sent anywhere.
-2. **See**: drop that file into the [web app](https://claude-inventory-tool.vercel.app/inventory). It's parsed in your browser; nothing is uploaded.
+1. **Scan**: run the one-liner below. It writes `stack-cleaner.json` next to you. No dependencies, nothing sent anywhere.
+2. **See**: drop that file into the [web app](https://stackcleaner.com/inventory). It's parsed in your browser; nothing is uploaded.
 3. **Tidy**: tick the items you want gone and export a shell script, a paste-to-Claude prompt, or JSON.
 
 ### The scan
@@ -35,10 +35,10 @@ This tool answers them. You run one command, it reads your local Claude Code ins
 **The one command**, same on macOS, Windows, and Linux, no `curl`, nothing piped:
 
 ```bash
-npx claude-inventory-tool@latest
+npx stack-cleaner@latest
 ```
 
-It runs the published npm package (which bundles the same scanner) and writes `claude-inventory.json` next to you. Node ships with Claude Code, so you already have it.
+It runs the published npm package (which bundles the same scanner) and writes `stack-cleaner.json` next to you. Node ships with Claude Code, so you already have it.
 
 <details>
 <summary>Prefer not to use npm? Download the script straight from this site instead.</summary>
@@ -46,13 +46,13 @@ It runs the published npm package (which bundles the same scanner) and writes `c
 **macOS / Linux** (bash/zsh):
 
 ```bash
-curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs | node
+curl -fsSL https://stackcleaner.com/scan.mjs | node
 ```
 
 **Windows** (PowerShell): `curl` there is an alias for `Invoke-WebRequest`, so call `curl.exe` and download-then-run instead of piping:
 
 ```powershell
-curl.exe -fsSL https://claude-inventory-tool.vercel.app/scan.mjs -o claude-inventory-scan.mjs; node claude-inventory-scan.mjs
+curl.exe -fsSL https://stackcleaner.com/scan.mjs -o stack-cleaner-scan.mjs; node stack-cleaner-scan.mjs
 ```
 
 </details>
@@ -60,11 +60,11 @@ curl.exe -fsSL https://claude-inventory-tool.vercel.app/scan.mjs -o claude-inven
 Prefer to read it first? It's one short, dependency-free file ([`public/scan.mjs`](public/scan.mjs)). Download then run (use `curl.exe` on Windows):
 
 ```bash
-curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs -o claude-inventory-scan.mjs
-node claude-inventory-scan.mjs
+curl -fsSL https://stackcleaner.com/scan.mjs -o stack-cleaner-scan.mjs
+node stack-cleaner-scan.mjs
 ```
 
-**Not comfortable in a terminal?** The [**Setup page**](https://claude-inventory-tool.vercel.app/setup) walks you through it copy-paste by copy-paste. You never need a GitHub account or any coding.
+**Not comfortable in a terminal?** The [**Setup page**](https://stackcleaner.com/setup) walks you through it copy-paste by copy-paste. You never need a GitHub account or any coding.
 
 ## What it captures
 
@@ -108,8 +108,8 @@ Nothing is ever removed by this tool. You stay in control.
 It's a standard Next.js (App Router) app with no backend and no database.
 
 ```bash
-git clone https://github.com/BespokeWoodcraftStudio/claude-inventory-tool
-cd claude-inventory-tool
+git clone https://github.com/BespokeWoodcraftStudio/stack-cleaner
+cd stack-cleaner
 npm install
 npm run dev        # http://localhost:3000
 
@@ -120,8 +120,8 @@ node public/scan.mjs
 Or install the published CLI globally and run it from anywhere:
 
 ```bash
-npm i -g claude-inventory-tool
-claude-inventory-tool          # writes claude-inventory.json in the current folder
+npm i -g stack-cleaner
+stack-cleaner          # writes stack-cleaner.json in the current folder
 ```
 
 Deploy your own copy to Vercel (or any static-capable Next host) with one click of "Import Project". There's nothing to configure.
@@ -183,9 +183,9 @@ components/                  ui primitives + page sections
 
 ## Documentation
 
-- [**FAQ**](docs/FAQ.md) (or the in-app [/faq](https://claude-inventory-tool.vercel.app/faq)): is anything uploaded, are my keys safe, can it delete things, Windows support…
+- [**FAQ**](docs/FAQ.md) (or the in-app [/faq](https://stackcleaner.com/faq)): is anything uploaded, are my keys safe, can it delete things, Windows support…
 - [**Usage guide**](docs/USAGE.md): a walkthrough of the inventory tool: filtering, selection, and the three cleanup exports.
-- [**Setup wizard**](https://claude-inventory-tool.vercel.app/setup): the non-technical, copy-paste path.
+- [**Setup wizard**](https://stackcleaner.com/setup): the non-technical, copy-paste path.
 - [**Security policy**](SECURITY.md): how to privately report a redaction miss (and what we already do).
 - [**Support / troubleshooting**](SUPPORT.md): common errors and where to get help.
 - [**Changelog**](CHANGELOG.md) · [**Contributing**](CONTRIBUTING.md) · [**Code of Conduct**](CODE_OF_CONDUCT.md)

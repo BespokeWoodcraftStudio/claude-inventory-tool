@@ -104,7 +104,7 @@ export function parseInventory(raw: unknown): Inventory {
   const obj = raw as Record<string, unknown>;
   if (!Array.isArray(obj.items)) {
     throw new InventoryError(
-      "Missing an `items` array. Make sure you uploaded the file scan.mjs produced (claude-inventory.json).",
+      "Missing an `items` array. Make sure you uploaded the file scan.mjs produced (stack-cleaner.json).",
     );
   }
 
@@ -346,7 +346,7 @@ const TYPE_LABEL: Record<ItemType, string> = {
 export function buildShellManifest(selected: InventoryItem[]): string {
   const lines = [
     "#!/usr/bin/env bash",
-    "# Claude Inventory Tool — cleanup manifest",
+    "# Stack Cleaner — cleanup manifest",
     `# ${selected.length} item(s) selected for removal. REVIEW before running.`,
     "# Project-scoped items run from inside that project's repo.",
     "set -e",
@@ -380,7 +380,7 @@ export function buildClaudePrompt(selected: InventoryItem[]): string {
 /** Structured JSON export of the selection. */
 export function buildSelectionJSON(selected: InventoryItem[]): string {
   return JSON.stringify({
-    generatedBy: "claude-inventory-tool",
+    generatedBy: "stack-cleaner",
     count: selected.length,
     items: selected.map((it) => ({
       id: it.id, type: it.type, scope: it.scope, project: it.project,

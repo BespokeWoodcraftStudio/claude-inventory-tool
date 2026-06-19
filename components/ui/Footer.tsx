@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo, Github } from "./icons";
 
-const REPO = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";
+const REPO = "https://github.com/BespokeWoodcraftStudio/stack-cleaner";
 
 export function Footer() {
   return (
@@ -9,7 +9,7 @@ export function Footer() {
       <div className="container row between wrap gap-3">
         <div className="row gap-2">
           <span className="glyph" style={{ width: 24, height: 24 }}><Logo size={14} /></span>
-          <span>Claude Inventory Tool</span>
+          <span>Stack Cleaner</span>
           <span className="faint hide-sm">· runs locally, sends nothing</span>
         </div>
         <div className="row gap-3">

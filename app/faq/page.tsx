@@ -5,17 +5,17 @@ import { Shield, Arrow, Upload, Github } from "@/components/ui/icons";
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "Answers to the common questions about the Claude Inventory Tool: what's uploaded (nothing), whether secrets are safe, what it can change (nothing), Windows support, and more.",
+    "Answers to the common questions about the Stack Cleaner: what's uploaded (nothing), whether secrets are safe, what it can change (nothing), Windows support, and more.",
   alternates: { canonical: "/faq" },
   openGraph: {
-    title: "Claude Inventory Tool: FAQ",
+    title: "Stack Cleaner: FAQ",
     description:
       "Is anything uploaded? Are my keys safe? Can it delete things? Plain answers to the questions people ask most.",
     url: "/faq",
   },
 };
 
-const REPO = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";
+const REPO = "https://github.com/BespokeWoodcraftStudio/stack-cleaner";
 const SECURITY = `${REPO}/blob/main/SECURITY.md`;
 const SUPPORT = `${REPO}/blob/main/SUPPORT.md`;
 
@@ -47,7 +47,7 @@ export default function Faq() {
         <Item q="Is anything uploaded?" defaultOpen>
           <p>
             No. The scan runs on your machine and never makes a network request. The web app parses
-            your <code className="inline">claude-inventory.json</code> in the browser and keeps it only
+            your <code className="inline">stack-cleaner.json</code> in the browser and keeps it only
             in that browser&apos;s <code className="inline">localStorage</code>. There is no server to
             upload to.
           </p>
@@ -115,7 +115,7 @@ export default function Faq() {
           <p>That&apos;s a healthy instinct. You have options, lightest-touch first:</p>
           <ul style={{ margin: "8px 0 0", paddingLeft: 20 }}>
             <li>
-              Run <code className="inline">npx claude-inventory-tool@latest</code> instead. No pipe, no{" "}
+              Run <code className="inline">npx stack-cleaner@latest</code> instead. No pipe, no{" "}
               <code className="inline">curl</code>: npm fetches the published, versioned package and
               runs it. It&apos;s the same code as <code className="inline">/scan.mjs</code>, just
               delivered through npm.

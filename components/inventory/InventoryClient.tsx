@@ -13,9 +13,9 @@ import { UsageSummary, fmtCount } from "./UsageSummary";
 import { Search, Trash, Upload, Shield } from "@/components/ui/icons";
 import { CopyButton } from "@/components/ui/CopyButton";
 
-const LS_INV = "cit:inventory:v1";
-const LS_SRC = "cit:source:v1";
-const LS_SEL = "cit:selected:v1";
+const LS_INV = "sc:inventory:v1";
+const LS_SRC = "sc:source:v1";
+const LS_SEL = "sc:selected:v1";
 
 export function InventoryClient() {
   const [inventory, setInventory] = useState<Inventory>(demoInventory);

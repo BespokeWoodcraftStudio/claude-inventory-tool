@@ -11,7 +11,7 @@ const STEPS = [
       <>
         One line in your terminal walks every <code className="inline">.claude</code>{" "}
         folder &mdash; global and per-project &mdash; and writes a single{" "}
-        <code className="inline">claude-inventory.json</code>. Secrets are stripped
+        <code className="inline">stack-cleaner.json</code>. Secrets are stripped
         before anything is written.
       </>
     ),

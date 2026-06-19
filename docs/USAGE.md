@@ -6,14 +6,14 @@ ships with a built-in demo dataset you can poke at right away.
 
 If you *do* want to point it at your own setup, that's the two-step flow in the
 [README](../README.md), and the guided, no-terminal version lives at
-[`/setup`](https://claude-inventory-tool.vercel.app/setup). This page assumes the file
+[`/setup`](https://stackcleaner.com/setup). This page assumes the file
 is already there (or you're on demo data) and focuses on what the screen does.
 
 ---
 
 ## 1. Open the tool with demo data
 
-Go to [`/inventory`](https://claude-inventory-tool.vercel.app/inventory).
+Go to [`/inventory`](https://stackcleaner.com/inventory).
 
 If you've never loaded your own file, it opens on the demo automatically — a real,
 hand-curated Claude Code inventory so the screen is never empty. A "Demo" banner sits
@@ -78,14 +78,14 @@ keep their counts from Claude Code's own `skillUsage` / `pluginUsage` tables.)
 
 The transcript read extracts **only** the tool / skill / agent / MCP-server names, the counts,
 and the timestamps — never your prompts, message text, tool arguments, file paths, or command
-contents. Nothing leaves your machine; the counts go into `claude-inventory.json` and stay there
+contents. Nothing leaves your machine; the counts go into `stack-cleaner.json` and stay there
 until you choose to upload the file.
 
 If you'd rather not have the scan read your transcripts at all, run it with **`--no-transcripts`**:
 
 ```bash
-npx claude-inventory-tool@latest --no-transcripts
-# or, from a downloaded script:  node claude-inventory-scan.mjs --no-transcripts
+npx stack-cleaner@latest --no-transcripts
+# or, from a downloaded script:  node stack-cleaner-scan.mjs --no-transcripts
 ```
 
 You'll still get the full inventory — just without the per-item invocation counts, so skills,
@@ -153,8 +153,8 @@ removals:
 - **JSON** — the raw selection, machine-readable, for your own tooling.
 
 Each format has a **Copy** button and a **Download** button (saving
-`claude-cleanup-prompt.txt`, `claude-cleanup.sh`, or
-`claude-inventory-selection.json`).
+`stack-cleaner-prompt.txt`, `stack-cleaner-cleanup.sh`, or
+`stack-cleaner-selection.json`).
 
 ---
 
@@ -170,7 +170,7 @@ approve what it does.
 
 ## Persistence
 
-Once you load your own `claude-inventory.json`, it's saved to this browser's
+Once you load your own `stack-cleaner.json`, it's saved to this browser's
 `localStorage` so it survives a refresh — and your selection is saved too. It is never
 uploaded; it lives only on this device. **Reset to demo** (or **Try the demo**) clears
 that stored inventory and selection and drops you back on the sample data. Clearing your

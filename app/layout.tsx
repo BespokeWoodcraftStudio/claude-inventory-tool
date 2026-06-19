@@ -5,29 +5,29 @@ import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 
-const SITE = "https://claude-inventory-tool.vercel.app";
+const SITE = "https://stackcleaner.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "Claude Inventory Tool: see & organize your Claude setup",
-    template: "%s · Claude Inventory Tool",
+    default: "Stack Cleaner: see & organize your Claude setup",
+    template: "%s · Stack Cleaner",
   },
   description:
     "A free tool to see, organize, and clean up your Claude skills, plugins, MCP servers, and agents, split by global vs. project. Runs locally, sends nothing.",
   keywords: ["Claude", "Claude Code", "skills", "plugins", "MCP", "agents", "inventory", "cleanup"],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Claude Inventory Tool",
+    title: "Stack Cleaner",
     description:
       "See and organize every Claude skill, plugin, MCP server, and agent: global vs. project. Free, local, private.",
     url: SITE,
-    siteName: "Claude Inventory Tool",
+    siteName: "Stack Cleaner",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Claude Inventory Tool",
+    title: "Stack Cleaner",
     description: "See and organize your Claude skills, plugins, MCP servers, and agents.",
   },
   // Icons come from file conventions: app/icon.svg + app/apple-icon.

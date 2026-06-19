@@ -41,14 +41,14 @@ export function UploadPanel({
     const list = files ? Array.from(files) : [];
     if (!list.length) return;
     if (list.length > 1) {
-      setError("Please drop a single claude-inventory.json file.");
+      setError("Please drop a single stack-cleaner.json file.");
       return;
     }
     const file = list[0];
     if (file.size > MAX_BYTES) {
       setError(
         `That file is ${(file.size / 1048576).toFixed(1)} MB, too big to be an inventory. ` +
-        "A real claude-inventory.json is only a few KB. Pick the file scan.mjs produced.",
+        "A real stack-cleaner.json is only a few KB. Pick the file scan.mjs produced.",
       );
       return;
     }
@@ -79,7 +79,7 @@ export function UploadPanel({
             <Upload size={22} />
           </div>
           <div className="stack gap-1 center">
-            <div style={{ fontSize: 17, fontWeight: 620 }}>Drop your <code className="inline">claude-inventory.json</code> here</div>
+            <div style={{ fontSize: 17, fontWeight: 620 }}>Drop your <code className="inline">stack-cleaner.json</code> here</div>
             <div className="muted" style={{ fontSize: 14 }}>
               {loading ? "Reading your file…" : "or choose it manually: nothing leaves your browser"}
             </div>
@@ -103,7 +103,7 @@ export function UploadPanel({
       {showPaste && (
         <div className="card stack gap-3">
           <label htmlFor="paste-json" className="muted" style={{ fontSize: 13, fontWeight: 600 }}>
-            Paste the contents of <code className="inline">claude-inventory.json</code>
+            Paste the contents of <code className="inline">stack-cleaner.json</code>
           </label>
           <textarea
             id="paste-json"
@@ -130,7 +130,7 @@ export function UploadPanel({
           <div className="row gap-2"><Terminal size={16} /><strong style={{ fontSize: 14 }}>Don&apos;t have the file yet?</strong></div>
           <p className="muted" style={{ fontSize: 14 }}>
             Run this in your terminal. It reads your local Claude setup and writes
-            <code className="inline"> claude-inventory.json</code> next to you. Zero dependencies, nothing sent anywhere.
+            <code className="inline"> stack-cleaner.json</code> next to you. Zero dependencies, nothing sent anywhere.
           </p>
           <ScanCommand />
           <div className="row gap-2" style={{ color: "var(--good)", fontSize: 13 }}>

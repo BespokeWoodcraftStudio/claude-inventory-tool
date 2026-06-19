@@ -11,7 +11,7 @@ const LINKS = [
   { href: "/faq", label: "FAQ", hideSm: false },
 ];
 
-const REPO = "https://github.com/BespokeWoodcraftStudio/claude-inventory-tool";
+const REPO = "https://github.com/BespokeWoodcraftStudio/stack-cleaner";
 
 export function Nav() {
   const path = usePathname();
@@ -20,7 +20,7 @@ export function Nav() {
       <div className="container nav-inner">
         <Link href="/" className="brand">
           <span className="glyph"><Logo size={17} /></span>
-          <span>Claude Inventory<span className="hide-sm" style={{ color: "var(--dim)", fontWeight: 500 }}> Tool</span></span>
+          <span>Stack Cleaner</span>
         </Link>
         <nav className="nav-links">
           {LINKS.map((l) => {

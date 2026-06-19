@@ -62,7 +62,7 @@ export function CleanupDrawer({
             <button
               className="btn btn-secondary btn-sm"
               onClick={() => download(
-                tab === "json" ? "claude-inventory-selection.json" : tab === "shell" ? "claude-cleanup.sh" : "claude-cleanup-prompt.txt",
+                tab === "json" ? "stack-cleaner-selection.json" : tab === "shell" ? "stack-cleaner-cleanup.sh" : "stack-cleaner-prompt.txt",
                 content,
                 tab === "json" ? "application/json" : "text/plain",
               )}

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // =============================================================
-// Claude Inventory Tool — local scan
+// Stack Cleaner — local scan
 //
-//   curl -fsSL https://claude-inventory-tool.vercel.app/scan.mjs | node
-//   # or:  node scan.mjs            (writes ./claude-inventory.json)
+//   curl -fsSL https://stackcleaner.com/scan.mjs | node
+//   # or:  node scan.mjs            (writes ./stack-cleaner.json)
 //          node scan.mjs --stdout   (prints JSON to stdout instead)
 //
 // Reads your local Claude Code install and writes a single JSON file
@@ -36,7 +36,7 @@ import readline from "node:readline";
 import { pathToFileURL } from "node:url";
 
 const SCHEMA_VERSION = 1;
-const GENERATOR = "scan.mjs@1.1.4";
+const GENERATOR = "scan.mjs@1.1.5";
 const HOME = os.homedir();
 const CLAUDE = path.join(HOME, ".claude");
 
@@ -650,7 +650,7 @@ export async function buildInventory(opts = {}) {
 export async function runScan(opts = {}) {
   const {
     stdout = false,
-    outFile = "claude-inventory.json",
+    outFile = "stack-cleaner.json",
     transcripts = true,
     transcriptsDir,
     quiet = false,
@@ -674,7 +674,7 @@ export async function runScan(opts = {}) {
 
   const log = (s) => process.stderr.write(s + "\n");
   log("");
-  log("  Claude Inventory Tool — scan complete");
+  log("  Stack Cleaner — scan complete");
   log("  ─────────────────────────────────────");
   log(`  skills ${by("skill")}   plugins ${by("plugin")}   mcp ${by("mcp")}   agents ${by("agent")}`);
   log(`  ${g} global · ${p} project   across ${inventory.projects.length} project${inventory.projects.length === 1 ? "" : "s"}`);
