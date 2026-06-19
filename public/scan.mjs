@@ -397,6 +397,35 @@ function buildProjectLabels(paths) {
   return labels;
 }
 
+// Enumerate what an installed plugin bundles, by reading its on-disk dir:
+//   <installDir>/skills/<name>/SKILL.md   → skill names
+//   <installDir>/agents/<name>.md         → agent names
+//   <installDir>/.mcp.json mcpServers     → mcp server names
+// Names only — no contents. Returns undefined when nothing is found.
+export function collectPluginBundles(installDir) {
+  if (!installDir || !exists(installDir)) return undefined;
+  const skills = [];
+  const skillsDir = path.join(installDir, "skills");
+  for (const d of listDir(skillsDir, "dir")) {
+    if (exists(path.join(skillsDir, d, "SKILL.md"))) skills.push(d);
+  }
+  const agents = [];
+  const agentsDir = path.join(installDir, "agents");
+  for (const f of listDir(agentsDir, "file")) {
+    if (f.endsWith(".md")) agents.push(f.replace(/\.md$/, ""));
+  }
+  const mcps = [];
+  const mcpCfg = readJSON(path.join(installDir, ".mcp.json"));
+  if (mcpCfg && mcpCfg.mcpServers && typeof mcpCfg.mcpServers === "object") {
+    for (const name of Object.keys(mcpCfg.mcpServers)) mcps.push(name);
+  }
+  const out = {};
+  if (skills.length) out.skills = skills;
+  if (agents.length) out.agents = agents;
+  if (mcps.length) out.mcps = mcps;
+  return Object.keys(out).length ? out : undefined;
+}
+
 // ---------- inventory build ----------
 // Collects every skill / agent / plugin / MCP item from the local install,
 // optionally overlays transcript usage, and returns the inventory OBJECT.
@@ -504,6 +533,7 @@ export async function buildInventory(opts = {}) {
       const installPath = entry && entry.installPath
         ? (entry.installPath.startsWith(HOME) ? tilde(entry.installPath) : "<external>")
         : undefined;
+      const bundles = entry && entry.installPath ? collectPluginBundles(entry.installPath) : undefined;
       items.push({
         // Bare name; the marketplace lives in `source` (matches the demo shape).
         id: `plugin:global:${pluginName}`,
@@ -513,6 +543,7 @@ export async function buildInventory(opts = {}) {
         source: marketplace || "",
         version: entry ? entry.version : undefined,
         path: installPath,
+        bundles,
         usageCount, lastUsedAt, usageClass,
         usageLabel: usageLabel(usageCount, lastUsedAt, usageClass),
         // The CLI wants the full name@marketplace form to uninstall.
