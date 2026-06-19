@@ -5,6 +5,7 @@
 
 import type {
   Inventory, InventoryItem, ItemType, Scope, UsageClass, UsageSource, UsageSummary,
+  OverlapRelation, PluginBundles,
 } from "./types";
 import { SCHEMA_VERSION } from "./types";
 
@@ -96,6 +97,19 @@ function collapseScanDuplicates(items: InventoryItem[]): InventoryItem[] {
   });
 }
 
+/** Coerce an unknown blob into PluginBundles, keeping only string[] entries. */
+function parseBundles(raw: unknown): PluginBundles | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : undefined);
+  const skills = arr(r.skills), agents = arr(r.agents), mcps = arr(r.mcps);
+  const out: PluginBundles = {};
+  if (skills && skills.length) out.skills = skills;
+  if (agents && agents.length) out.agents = agents;
+  if (mcps && mcps.length) out.mcps = mcps;
+  return Object.keys(out).length ? out : undefined;
+}
+
 /** Validate + normalize an unknown blob (parsed from an uploaded file or paste). */
 export function parseInventory(raw: unknown): Inventory {
   if (!raw || typeof raw !== "object") {
@@ -133,6 +147,7 @@ export function parseInventory(raw: unknown): Inventory {
       source,
       path: asString(r.path),
       version: asString(r.version),
+      bundles: type === "plugin" ? parseBundles(r.bundles) : undefined,
       usageCount: typeof r.usageCount === "number" ? r.usageCount : null,
       lastUsedAt: typeof r.lastUsedAt === "number" ? r.lastUsedAt : null,
       usageClass,
@@ -241,6 +256,110 @@ export function deriveRemoveCmd(it: Pick<InventoryItem, "type" | "scope" | "proj
   }
 }
 
+// ---------- overlap / duplicate detection ----------
+
+/**
+ * Normalize a name for cross-item matching. Mirrors the scanner's normalizeName
+ * (public/scan.mjs): lowercase, trim, drop a leading "plugin_"/"plugin:" prefix,
+ * and take the trailing segment of a "ns:name" form ("vercel:deploy" → "deploy").
+ * Keep the two in sync.
+ */
+export function normalizeName(s: string): string {
+  if (!s) return "";
+  let n = String(s).toLowerCase().trim().replace(/^plugin[_:]/, "");
+  if (n.includes(":")) n = n.split(":").pop() as string;
+  return n.trim();
+}
+
+const BUNDLE_KEY: Record<"skill" | "agent" | "mcp", keyof PluginBundles> = {
+  skill: "skills", agent: "agents", mcp: "mcps",
+};
+
+function scopeLabel(it: InventoryItem): string {
+  return it.scope === "global" ? "global" : `project ${it.project ?? "unknown"}`;
+}
+
+/**
+ * Compute structural overlaps. Three precise signals, no fuzzy matching:
+ *  1. bundled-in-plugin — a standalone skill/agent/mcp whose normalized name is in
+ *     an installed plugin's `bundles`. Standalone = redundant, plugin = survivor.
+ *  2. duplicate-name — two non-plugin items of the same type + normalized name in
+ *     different places. Both = peer.
+ *  3. duplicate-mcp — the duplicate-name case for type "mcp" (separate kind label).
+ * Returns a Map keyed by item id; only items with ≥1 relation are present.
+ */
+export function computeOverlaps(items: InventoryItem[]): Map<string, OverlapRelation[]> {
+  const out = new Map<string, OverlapRelation[]>();
+  const add = (id: string, rel: OverlapRelation) => {
+    const arr = out.get(id);
+    if (arr) arr.push(rel); else out.set(id, [rel]);
+  };
+
+  const plugins = items.filter((i) => i.type === "plugin");
+  const nonPlugins = items.filter((i) => i.type !== "plugin");
+
+  // 1. bundled-in-plugin
+  for (const p of plugins) {
+    if (!p.bundles) continue;
+    for (const it of nonPlugins) {
+      if (it.type === "plugin") continue;
+      const key = BUNDLE_KEY[it.type as "skill" | "agent" | "mcp"];
+      const list = p.bundles[key];
+      if (!list) continue;
+      const norm = normalizeName(it.name);
+      if (!list.some((b) => normalizeName(b) === norm)) continue;
+      add(it.id, {
+        kind: "bundled-in-plugin", role: "redundant",
+        withId: p.id, withLabel: p.name,
+        note: `superseded by plugin ${p.name}`,
+      });
+      add(p.id, {
+        kind: "bundled-in-plugin", role: "survivor",
+        withId: it.id, withLabel: it.name,
+        note: `also installed standalone: ${it.name}`,
+      });
+    }
+  }
+
+  // 2 + 3. duplicate-name / duplicate-mcp (group non-plugins by type + normalized name)
+  const groups = new Map<string, InventoryItem[]>();
+  for (const it of nonPlugins) {
+    const k = `${it.type}:${normalizeName(it.name)}`;
+    const arr = groups.get(k);
+    if (arr) arr.push(it); else groups.set(k, [it]);
+  }
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    for (const it of group) {
+      for (const other of group) {
+        if (other.id === it.id) continue;
+        add(it.id, {
+          kind: it.type === "mcp" ? "duplicate-mcp" : "duplicate-name",
+          role: "peer",
+          withId: other.id, withLabel: other.name,
+          note: `also ${scopeLabel(other)}`,
+        });
+      }
+    }
+  }
+
+  return out;
+}
+
+/** Return a new items array with each item's `overlaps` set (when it has any). */
+export function withOverlaps(items: InventoryItem[]): InventoryItem[] {
+  const map = computeOverlaps(items);
+  return items.map((it) => {
+    const rels = map.get(it.id);
+    return rels ? { ...it, overlaps: rels } : it;
+  });
+}
+
+/** Ids of items with at least one `redundant` overlap relation (the safe bulk-remove set). */
+export function redundantIds(items: InventoryItem[]): string[] {
+  return items.filter((it) => it.overlaps?.some((r) => r.role === "redundant")).map((it) => it.id);
+}
+
 // ---------- stats ----------
 
 export interface Stats {
@@ -250,20 +369,26 @@ export interface Stats {
   byType: Record<ItemType, number>;
   byUsage: Record<UsageClass, number>;
   unusedCount: number; // bad + warn
+  redundantCount: number; // items with a `redundant` overlap relation
+  overlapCount: number;   // items with at least one overlap relation (any role)
 }
 
 export function computeStats(items: InventoryItem[]): Stats {
   const byType = { skill: 0, plugin: 0, mcp: 0, agent: 0 } as Record<ItemType, number>;
   const byUsage = { good: 0, warn: 0, bad: 0, info: 0, unknown: 0 } as Record<UsageClass, number>;
-  let global = 0, project = 0;
+  let global = 0, project = 0, redundantCount = 0, overlapCount = 0;
   for (const it of items) {
     byType[it.type]++;
     byUsage[it.usageClass || "unknown"]++;
     if (it.scope === "global") global++; else project++;
+    if (it.overlaps?.some((r) => r.role === "redundant")) redundantCount++;
+    if (it.overlaps && it.overlaps.length > 0) overlapCount++;
   }
   return {
     total: items.length, global, project, byType, byUsage,
     unusedCount: byUsage.bad + byUsage.warn,
+    redundantCount,
+    overlapCount,
   };
 }
 
@@ -275,15 +400,17 @@ export interface Filters {
   scope: Scope | "all";
   project: string | "all";
   usage: UsageClass | "all" | "unused"; // "unused" = bad+warn
+  overlapOnly: boolean; // show only items with at least one overlap relation
 }
 
 export const DEFAULT_FILTERS: Filters = {
-  query: "", type: "all", scope: "all", project: "all", usage: "all",
+  query: "", type: "all", scope: "all", project: "all", usage: "all", overlapOnly: false,
 };
 
 export function filterItems(items: InventoryItem[], f: Filters): InventoryItem[] {
   const q = f.query.trim().toLowerCase();
   return items.filter((it) => {
+    if (f.overlapOnly && !(it.overlaps && it.overlaps.length > 0)) return false;
     if (f.type !== "all" && it.type !== f.type) return false;
     if (f.scope !== "all" && it.scope !== f.scope) return false;
     if (f.project !== "all" && (it.project || "") !== f.project) return false;

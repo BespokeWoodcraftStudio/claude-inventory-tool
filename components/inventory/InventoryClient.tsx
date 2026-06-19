@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Inventory, InventoryItem, ItemType, UsageClass } from "@/lib/types";
 import {
   computeStats, filterItems, groupByScope, DEFAULT_FILTERS, parseInventory,
+  withOverlaps, redundantIds,
   TYPE_META, TYPE_ORDER, USAGE_META, type Filters,
 } from "@/lib/inventory";
 import { demoInventory } from "@/lib/demo";
@@ -67,7 +68,8 @@ export function InventoryClient() {
     catch { /* ignore */ }
   }, []);
 
-  const items = inventory.items;
+  const items = useMemo(() => withOverlaps(inventory.items), [inventory.items]);
+  const redundant = useMemo(() => redundantIds(items), [items]);
   const stats = useMemo(() => computeStats(items), [items]);
   const filtered = useMemo(() => filterItems(items, filters), [items, filters]);
   const groups = useMemo(() => groupByScope(filtered, inventory.projectLocations), [filtered, inventory.projectLocations]);
@@ -137,11 +139,18 @@ export function InventoryClient() {
             ? `${items.length} items`
             : `${filtered.length} of ${items.length} items`}
         </div>
-        {filtered.length > 0 && (
+        {(redundant.length > 0 || filtered.length > 0 || selected.size > 0) && (
           <div className="row gap-2">
-            <button className="btn btn-ghost btn-sm" onClick={() => selectMany(filtered.filter((i) => i.usageClass === "bad" || i.usageClass === "warn").map((i) => i.id), true)}>
-              Select unused in view
-            </button>
+            {redundant.length > 0 && (
+              <button className="btn btn-ghost btn-sm" onClick={() => selectMany(redundant, true)}>
+                Select {redundant.length} redundant {redundant.length === 1 ? "copy" : "copies"}
+              </button>
+            )}
+            {filtered.length > 0 && (
+              <button className="btn btn-ghost btn-sm" onClick={() => selectMany(filtered.filter((i) => i.usageClass === "bad" || i.usageClass === "warn").map((i) => i.id), true)}>
+                Select unused in view
+              </button>
+            )}
             {selected.size > 0 && <button className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>Clear all</button>}
           </div>
         )}
@@ -190,6 +199,13 @@ function StatStrip({ stats, inventory, filters, setFilters }: {
     { key: "used", display: fmtCount(stats.byUsage.good), lbl: "actively used", tone: "var(--good)", aria: "Filter to actively used items", onClick: () => setFilters({ ...filters, usage: "good" }) },
     { key: "unused", display: fmtCount(stats.unusedCount), lbl: "unused", tone: "var(--bad)", aria: "Filter to unused items", onClick: () => setFilters({ ...filters, usage: "unused" }) },
   ];
+  if (stats.redundantCount > 0) {
+    cells.push({
+      key: "redundant", display: fmtCount(stats.redundantCount), lbl: "redundant",
+      tone: "var(--bad)", aria: "Filter to items a plugin already provides",
+      onClick: () => setFilters({ ...filters, overlapOnly: true }),
+    });
+  }
   // Transcript-derived cells — only when a usage scan actually ran. Not
   // clickable (they describe the scan, not a filter), so no onClick.
   if (usage) {
@@ -290,6 +306,11 @@ function FilterBar({ inventory, stats, filters, setFilters }: {
             {c.label}<span className="count">{c.n}</span>
           </button>
         ))}
+        <span style={{ width: 1, background: "var(--line)", margin: "0 4px" }} />
+        <button className={`chip${filters.overlapOnly ? " active" : ""}`}
+          onClick={() => setFilters({ ...filters, overlapOnly: !filters.overlapOnly })}>
+          Overlaps<span className="count">{stats.overlapCount}</span>
+        </button>
       </div>
     </div>
   );
@@ -375,7 +396,7 @@ function ItemRow({ item, checked, onToggle }: { item: InventoryItem; checked: bo
       />
       <div className="stack gap-1 grow" style={{ minWidth: 0 }}>
         <div className="row gap-2 wrap">
-          <span className="mono" style={{ fontWeight: 600, fontSize: 14, color: checked ? "var(--fg)" : "var(--fg)", textDecoration: checked ? "line-through" : "none", textDecorationColor: "var(--bad)" }}>
+          <span className="mono" style={{ fontWeight: 600, fontSize: 14, color: "var(--fg)", textDecorationLine: checked ? "line-through" : "none", textDecorationColor: "var(--bad)" }}>
             {item.name}
           </span>
           <span className={`badge ${TYPE_TONE[item.type]}`}>{TYPE_META[item.type].label}</span>
@@ -391,6 +412,26 @@ function ItemRow({ item, checked, onToggle }: { item: InventoryItem; checked: bo
         </div>
         {item.description && <div style={{ fontSize: 13.5, color: "var(--fg-soft)" }}>{item.description}</div>}
         {item.overlap && <div className="muted" style={{ fontSize: 12.5, fontStyle: "italic" }}>↳ also: {item.overlap}</div>}
+        {item.overlaps && item.overlaps.length > 0 && (() => {
+          const redundantRel = item.overlaps.filter((r) => r.role === "redundant");
+          const peerRel = item.overlaps.filter((r) => r.role === "peer");
+          const survives = item.overlaps.filter((r) => r.role === "survivor").length;
+          return (
+            <div className="row gap-1 wrap" style={{ marginTop: 1 }}>
+              {redundantRel.map((r, i) => (
+                <span key={`r${i}`} className="badge bad" title={r.note}>⧉ {r.note}</span>
+              ))}
+              {peerRel.map((r, i) => (
+                <span key={`p${i}`} className="badge info" title={r.note}>⧉ {r.note}</span>
+              ))}
+              {survives > 0 && (
+                <span className="badge good" title="This plugin already provides items you also have installed standalone">
+                  ⧉ provides {survives} standalone {survives === 1 ? "copy" : "copies"}
+                </span>
+              )}
+            </div>
+          );
+        })()}
         {item.source && <div className="faint mono" style={{ fontSize: 12 }}>{item.source}</div>}
         {checked && (
           <div className="row gap-2" style={{ marginTop: 4 }}>
