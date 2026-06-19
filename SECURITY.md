@@ -1,19 +1,19 @@
 # Security Policy
 
-The whole pitch of this tool is that **secrets are stripped before anything leaves your machine**. So a redaction miss is the most serious bug we can have. If you find one, we want to hear about it — quietly, and quickly.
+The whole pitch of this tool is that **secrets are stripped before anything leaves your machine**. So a redaction miss is the most serious bug we can have. If you find one, we want to hear about it: quietly, and quickly.
 
 This document explains how to report a problem, what counts as in scope, and what we already do to protect you.
 
 ## How to report a vulnerability
 
-Please use a **private** channel. Do not open a public GitHub issue for a security problem — especially not one that includes a leaked secret.
+Please use a **private** channel. Do not open a public GitHub issue for a security problem, especially not one that includes a leaked secret.
 
 Two ways, in order of preference:
 
 1. **GitHub private advisory (preferred).** Go to the repo's **Security** tab → **Report a vulnerability**. This opens a private security advisory that only the maintainer can see.
 2. **Email.** Write to **info@pixelventuresllc.com**.
 
-That's it. There are no other contacts — if you see an address like `security@…` somewhere, it isn't ours.
+That's it. There are no other contacts. If you see an address like `security@…` somewhere, it isn't ours.
 
 ## The #1 issue: a secret reached `claude-inventory.json`
 
@@ -25,8 +25,8 @@ The output file should never contain a real credential or your real home-directo
 
 Before you report, please do two things:
 
-1. **Rotate the exposed credential first.** Treat any secret that landed in the file as compromised. Revoke or roll it before doing anything else — the file may have been copied, synced, or backed up without you noticing.
-2. **Send a redacted reproduction — never the raw secret.** Show us the *shape* of the config that slipped through, with the secret value removed. For example:
+1. **Rotate the exposed credential first.** Treat any secret that landed in the file as compromised. Revoke or roll it before doing anything else. The file may have been copied, synced, or backed up without you noticing.
+2. **Send a redacted reproduction, never the raw secret.** Show us the *shape* of the config that slipped through, with the secret value removed. For example:
 
    ```jsonc
    // The config shape that leaked — value replaced with a placeholder:
@@ -40,7 +40,7 @@ Before you report, please do two things:
    }
    ```
 
-   We can fix the redaction rule from the shape alone. We do not need — and do not want — your real secret.
+   We can fix the redaction rule from the shape alone. We do not need (and do not want) your real secret.
 
 ## What to include in a report
 
@@ -48,8 +48,8 @@ A good report tells us enough to reproduce the miss without exposing you:
 
 - **OS** (e.g. macOS 15, Ubuntu 24.04, Windows 11).
 - **Node version** (`node --version`).
-- **The scanner version** — the `generator` field in your JSON (e.g. `scan.mjs@1.0.0`).
-- **Which redaction rule should have caught it** — env value, auth header, URL credential or query string, token-looking argument, or the home-directory rewrite.
+- **The scanner version**: the `generator` field in your JSON (e.g. `scan.mjs@1.0.0`).
+- **Which redaction rule should have caught it**: env value, auth header, URL credential or query string, token-looking argument, or the home-directory rewrite.
 - The **redacted** config shape that slipped through (see above).
 
 ## Scope
@@ -58,24 +58,24 @@ A good report tells us enough to reproduce the miss without exposing you:
 
 **In scope:**
 
-- **Redaction misses** — a real secret or a `/Users/<name>/` path reaching `claude-inventory.json`. This is the top priority.
-- **Client-side issues** — for example, XSS or other injection via a crafted inventory file that the app parses in the browser.
-- **Supply-chain trust of the `curl … | node` one-liner** — anything that could let the scan you run differ from the published, auditable `public/scan.mjs`.
+- **Redaction misses**: a real secret or a `/Users/<name>/` path reaching `claude-inventory.json`. This is the top priority.
+- **Client-side issues**: for example, XSS or other injection via a crafted inventory file that the app parses in the browser.
+- **Supply-chain trust of the `curl … | node` one-liner**: anything that could let the scan you run differ from the published, auditable `public/scan.mjs`.
 
 ## Response expectations
 
-This is a volunteer, open-source project, so responses are best-effort. We aim to **acknowledge a report within a few days**. Redaction misses get triaged first. We'll keep you posted as we work on a fix, and we're glad to credit you once it ships (or to keep you anonymous — your call).
+This is a volunteer, open-source project, so responses are best-effort. We aim to **acknowledge a report within a few days**. Redaction misses get triaged first. We'll keep you posted as we work on a fix, and we're glad to credit you once it ships (or to keep you anonymous; your call).
 
 ## What we already do
 
 A quick reassurance, since the output describes your tooling:
 
 - The scan **runs entirely on your machine** and makes **zero network calls**.
-- The web app **parses your file in the browser** and stores it only in that browser's `localStorage` — it is never uploaded.
+- The web app **parses your file in the browser** and stores it only in that browser's `localStorage`. It is never uploaded.
 - **Secrets are redacted before the file is written**: MCP `env` values, auth headers, URL credentials and query strings, and token-looking command arguments are replaced with `<redacted>`.
 - Your **home directory is rewritten to `~`**, so your username doesn't leak.
 
-One documented caveat: skill and agent **descriptions** are prose copied from frontmatter. We do run a best-effort scrub over them (obvious token shapes like `sk-…`, `ghp_…`, and `Authorization: …` are redacted), but that pass is not a guarantee — so don't keep secrets in a `SKILL.md` or agent description.
+One documented caveat: skill and agent **descriptions** are prose copied from frontmatter. We do run a best-effort scrub over them (obvious token shapes like `sk-…`, `ghp_…`, and `Authorization: …` are redacted), but that pass is not a guarantee, so don't keep secrets in a `SKILL.md` or agent description.
 
 ## How transcripts are handled
 

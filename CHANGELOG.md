@@ -18,6 +18,33 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-06-18
+
+### Fixed
+
+- **Two projects that share a folder name no longer collapse into one.** The
+  scanner labeled each project by its bare basename, so two repos both named (say)
+  `web` at different paths merged into a single inventory group with one on-disk
+  location (last write wins). Colliding projects are now disambiguated by their
+  parent directory (`a/web`, `b/web`), falling back to the full path if even that
+  collides. No `schemaVersion` change and no change to redaction.
+
+### Added
+
+- A unit-test suite (`vitest`, run with `npm test`) covering the privacy-critical
+  secret redaction (`scrubSecrets` / `redactArgs` / `redactUrl` / `looksLikeToken`),
+  the inventory parser and phantom-`$HOME` de-duplication, and the new
+  project-label disambiguation. Repository-only; it is not part of the published
+  npm package (the CLI still ships zero runtime dependencies).
+- GitHub Actions CI that runs the tests and a production build on every push and
+  pull request.
+
+### Changed
+
+- Swept em-dashes out of the repository docs (README, CONTRIBUTING, SECURITY,
+  SUPPORT, CODE_OF_CONDUCT, the PR template), matching the website-copy sweep from
+  1.1.3. Prose only; code samples are untouched.
+
 ## [1.1.3] - 2026-06-17
 
 ### Added

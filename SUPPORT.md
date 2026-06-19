@@ -2,9 +2,9 @@
 
 Need a hand? Here's where to go.
 
-- **Found a bug?** Open a [GitHub issue](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/issues). Tell us what you ran, what you expected, and what happened — and your OS and Node version (`node --version`) help a lot.
+- **Found a bug?** Open a [GitHub issue](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/issues). Tell us what you ran, what you expected, and what happened, plus your OS and Node version (`node --version`) help a lot.
 - **Have a question?** Start a [GitHub Discussion](https://github.com/BespokeWoodcraftStudio/claude-inventory-tool/discussions), or email [info@pixelventuresllc.com](mailto:info@pixelventuresllc.com). For conceptual questions ("what counts as a project?", "why is this passive?"), the [FAQ](docs/FAQ.md) probably has it.
-- **Found a security problem — especially a real secret that landed in `claude-inventory.json`?** Do **not** open a public issue. Follow [SECURITY.md](SECURITY.md): rotate the exposed credential first, then report it privately through the repo's Security tab ("Report a vulnerability") or by email. A leaked secret must never go in a public issue.
+- **Found a security problem, especially a real secret that landed in `claude-inventory.json`?** Do **not** open a public issue. Follow [SECURITY.md](SECURITY.md): rotate the exposed credential first, then report it privately through the repo's Security tab ("Report a vulnerability") or by email. A leaked secret must never go in a public issue.
 
 If you'd like to help fix something rather than just report it, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -16,7 +16,7 @@ Most snags happen at the scan step. Here are the ones we see, with the cause and
 
 **Cause:** Node isn't installed, or you installed it but didn't reopen the terminal so it isn't on your PATH yet.
 
-**Fix:** Install Node from [nodejs.org](https://nodejs.org) (the "LTS" download is the right one), then **fully close and reopen your terminal** and run the scan again. Check it took with `node --version` — you should see a version number. If you use Claude Code, you already have Node; reopening the terminal usually solves it.
+**Fix:** Install Node from [nodejs.org](https://nodejs.org) (the "LTS" download is the right one), then **fully close and reopen your terminal** and run the scan again. Check it took with `node --version`. You should see a version number. If you use Claude Code, you already have Node; reopening the terminal usually solves it.
 
 ### The scan command errors in Windows PowerShell
 
@@ -34,17 +34,17 @@ If that still gives you trouble, the [Setup page](https://claude-inventory-tool.
 
 **Cause:** The whole file didn't make it in. Usually only part of `claude-inventory.json` was copied, or a screenshot was pasted instead of the file's contents.
 
-**Fix:** Re-run the scan and grab the **entire** `claude-inventory.json` — every character from the opening `{` to the closing `}`. The easiest path is to drop the file itself into the app rather than copy-pasting its text. A screenshot can't be read; the tool needs the JSON.
+**Fix:** Re-run the scan and grab the **entire** `claude-inventory.json`: every character from the opening `{` to the closing `}`. The easiest path is to drop the file itself into the app rather than copy-pasting its text. A screenshot can't be read; the tool needs the JSON.
 
 ### "My inventory looks empty" / "a project is missing"
 
 **Cause:** The scan reads the list of projects from `~/.claude.json`. A repo that Claude Code has never opened won't be in that list, so it won't appear.
 
-**Fix:** Open the missing repo in Claude Code and run a short session there once, **or** run the scan from inside that folder (`cd` into it first, then run the scan). Then re-run and re-drop the file. If *everything* looks empty, you likely haven't used Claude Code on this machine yet — there's simply nothing to inventory.
+**Fix:** Open the missing repo in Claude Code and run a short session there once, **or** run the scan from inside that folder (`cd` into it first, then run the scan). Then re-run and re-drop the file. If *everything* looks empty, you likely haven't used Claude Code on this machine yet. There's simply nothing to inventory.
 
 ### "I can't find claude-inventory.json"
 
-**Cause:** The file is saved in whatever folder your terminal was sitting in when you ran the scan — not a fixed location.
+**Cause:** The file is saved in whatever folder your terminal was sitting in when you ran the scan, not a fixed location.
 
 **Fix:** Trust the printed `✓` path. When the scan finishes it prints the full path it wrote to (something like `✓ wrote ~/claude-inventory.json`). Open that exact folder. If you're not sure where your terminal was, the scan's last line tells you.
 
@@ -70,9 +70,9 @@ Both run the same scan and write the same `claude-inventory.json`.
 
 ### "My data disappeared"
 
-**Cause:** The app keeps your loaded inventory only in **this browser's** `localStorage` — nothing is uploaded or saved server-side. Clearing site data, using private/incognito mode, or switching to a different browser or profile starts you fresh.
+**Cause:** The app keeps your loaded inventory only in **this browser's** `localStorage`. Nothing is uploaded or saved server-side. Clearing site data, using private/incognito mode, or switching to a different browser or profile starts you fresh.
 
-**Fix:** Just re-drop your `claude-inventory.json` into the app. (If you still have the file, you're set. If not, re-run the scan — it's instant.)
+**Fix:** Just re-drop your `claude-inventory.json` into the app. (If you still have the file, you're set. If not, re-run the scan; it's instant.)
 
 ---
 

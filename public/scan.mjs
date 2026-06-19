@@ -36,7 +36,7 @@ import readline from "node:readline";
 import { pathToFileURL } from "node:url";
 
 const SCHEMA_VERSION = 1;
-const GENERATOR = "scan.mjs@1.1.3";
+const GENERATOR = "scan.mjs@1.1.4";
 const HOME = os.homedir();
 const CLAUDE = path.join(HOME, ".claude");
 
@@ -366,6 +366,37 @@ async function scanTranscripts({ transcriptsDir, quiet = false } = {}) {
   return { byKey, totalInvocations, transcriptsScanned };
 }
 
+// ---------- project labels ----------
+// Map each eligible project dir to a unique display label. Normally the basename,
+// but when two project paths share a basename (e.g. ~/a/web and ~/b/web) the bare
+// basename would collapse them into one inventory group with a single (last-wins)
+// location. Colliding ones are qualified with their parent dir ("a/web", "b/web"),
+// falling back to the full home-relative path if even that still collides — so
+// distinct projects always stay distinct.
+function buildProjectLabels(paths) {
+  const byBase = new Map();
+  for (const p of paths) {
+    const b = path.basename(p);
+    const arr = byBase.get(b);
+    if (arr) arr.push(p); else byBase.set(b, [p]);
+  }
+  const labels = new Map();
+  for (const [base, group] of byBase) {
+    if (group.length === 1) { labels.set(group[0], base); continue; }
+    const byParent = new Map();
+    for (const p of group) {
+      const q = `${path.basename(path.dirname(p))}/${base}`;
+      const arr = byParent.get(q);
+      if (arr) arr.push(p); else byParent.set(q, [p]);
+    }
+    for (const [qualified, qgroup] of byParent) {
+      if (qgroup.length === 1) labels.set(qgroup[0], qualified);
+      else for (const p of qgroup) labels.set(p, tilde(p)); // last resort: unique path
+    }
+  }
+  return labels;
+}
+
 // ---------- inventory build ----------
 // Collects every skill / agent / plugin / MCP item from the local install,
 // optionally overlays transcript usage, and returns the inventory OBJECT.
@@ -502,16 +533,18 @@ export async function buildInventory(opts = {}) {
   }
   for (const p of Object.keys(root.projects || {})) projectPaths.add(p);
 
-  for (const projPath of projectPaths) {
-    if (!exists(projPath)) continue; // path may be stale
-    // The home directory's .claude IS the global scope. If a project path points
-    // at $HOME (the scan was run from there, or $HOME is registered in
-    // ~/.claude.json's projects), its .claude/skills are the SAME files already
-    // counted as global — scanning it as a "project" would duplicate every global
-    // skill, agent, and MCP server (showing up as a phantom project named after
-    // your username). Skip it.
-    if (path.resolve(path.join(projPath, ".claude")) === path.resolve(CLAUDE)) continue;
-    const project = path.basename(projPath);
+  // Keep only real, non-global project dirs. The home directory's .claude IS the
+  // global scope, so a project path resolving to it (the scan ran from $HOME, or
+  // $HOME is registered in ~/.claude.json's projects) would duplicate every global
+  // skill/agent/MCP as a phantom project named after your username — skip it.
+  const eligiblePaths = [...projectPaths].filter(
+    (p) => exists(p) && path.resolve(path.join(p, ".claude")) !== path.resolve(CLAUDE),
+  );
+  // Disambiguate any project dirs that share a basename so they stay distinct.
+  const projectLabels = buildProjectLabels(eligiblePaths);
+
+  for (const projPath of eligiblePaths) {
+    const project = projectLabels.get(projPath) || path.basename(projPath);
     const projConf = (root.projects && root.projects[projPath]) || {};
 
     let touched = false;
@@ -658,7 +691,7 @@ export async function runScan(opts = {}) {
   return inventory;
 }
 
-export { scrubSecrets, redactArgs, redactUrl, looksLikeToken };
+export { scrubSecrets, redactArgs, redactUrl, looksLikeToken, buildProjectLabels };
 
 // ---------- CLI arg parsing + auto-run guard ----------
 function parseArgs(argv) {
