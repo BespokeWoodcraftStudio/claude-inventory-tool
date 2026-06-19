@@ -18,6 +18,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-06-19
+
+### Fixed
+
+- **Scanner metadata.** `public/scan.mjs` now correctly stamps `schemaVersion: 2` and
+  `generator: "scan.mjs@1.2.1"`. The 1.2.0 scanner already emitted the new `bundles`
+  data (so duplicate detection worked), but still reported `schemaVersion: 1` and
+  `scan.mjs@1.1.5` — a metadata mismatch only, with no change to the data or behavior.
+
 ## [1.2.0] - 2026-06-19
 
 ### Added
@@ -239,5 +248,6 @@ Initial public release.
 - **The scan only reads.** It makes no network request and never installs,
   modifies, or removes anything.
 
-[Unreleased]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/releases/tag/v1.0.0
+[Unreleased]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/releases/tag/v1.2.1
+[1.2.0]: https://github.com/BespokeWoodcraftStudio/stack-cleaner/releases/tag/v1.2.0

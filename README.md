@@ -14,7 +14,7 @@ Free · open source · runs locally · sends nothing.
 
 Over time, Claude Code accumulates a lot: user-level skills in `~/.claude`, project skills in every repo's `.claude`, plugins from a handful of marketplaces, MCP servers wired into different projects, and a pile of sub-agents. It gets hard to answer simple questions: *what do I actually have? what do I never use? what's duplicated? what can I safely remove?*
 
-This tool answers them. You run one command, it reads your local Claude Code install, and the web app shows everything **grouped by where it lives** (global vs. each project), with **real usage counts**, so you can spot the dead weight and build a one-click cleanup plan.
+This tool answers them. You run one command, it reads your local Claude Code install, and the web app shows everything **grouped by where it lives** (global vs. each project), with **real usage counts** and **automatic duplicate detection**, so you can spot the dead weight, see what's redundant, and build a one-click cleanup plan.
 
 ## How it works
 
@@ -82,6 +82,15 @@ It enumerates **every project** Claude Code knows about (from `~/.claude.json`),
 ### Where usage counts come from
 
 The scan reads your local Claude Code **transcripts** (`~/.claude/projects/*.jsonl`) to count real invocations for **skills, agents, and MCP servers**, so you can finally see what's *installed but never used*, even for the types that carry no usage count in plain config. It extracts **only the tool / skill / agent / MCP-server names, the counts, and the timestamps**, never your prompts, message text, tool arguments, file paths, or command contents. It all stays local until you choose to upload the file. Pass `--no-transcripts` to skip the transcript read entirely. (Skills and plugins also keep their counts from Claude Code's own `skillUsage` / `pluginUsage` tables.)
+
+## Finding duplicates
+
+Claude Code makes it easy to end up with the same thing twice — a standalone skill you installed by hand that a plugin now bundles, the same MCP server wired up from two sources, or same-named copies across global and a project. Stack Cleaner flags these **automatically**:
+
+- **Superseded by a plugin** — a standalone skill, agent, or MCP server that an installed plugin already provides. The plugin's copy stays updated; the loose one won't, so it's the safe one to remove.
+- **Same-name duplicates** and **duplicate MCP servers** — the same item installed two different ways.
+
+Every flagged item explains, in plain language, *what* it duplicates, *where* your copy lives, and *which* one to keep. A **Duplicates** filter and a **"Select N redundant copies"** button turn the whole pile into a one-click cleanup.
 
 ## Privacy & safety
 

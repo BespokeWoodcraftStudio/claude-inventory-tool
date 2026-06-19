@@ -35,8 +35,8 @@ import os from "node:os";
 import readline from "node:readline";
 import { pathToFileURL } from "node:url";
 
-const SCHEMA_VERSION = 1;
-const GENERATOR = "scan.mjs@1.1.5";
+const SCHEMA_VERSION = 2;
+const GENERATOR = "scan.mjs@1.2.1";
 const HOME = os.homedir();
 const CLAUDE = path.join(HOME, ".claude");
 

@@ -48,8 +48,9 @@ Below the filters, items are grouped by scope:
 
 This split is the whole point: it's how you tell "I installed this once, everywhere"
 from "this is scoped to one repo." Every row carries a colored type badge
-(**skill**, **plugin**, **mcp**, **agent**), its description, and any overlap note
-("↳ also: …") flagging a duplicate elsewhere in your setup.
+(**skill**, **plugin**, **mcp**, **agent**), its description, and — when it's a duplicate
+— a plain-language **duplicate flag** that names what supersedes it, where your loose copy
+lives, and which copy to keep.
 
 ### Usage badges
 
@@ -95,7 +96,7 @@ agents, and MCP servers fall back to the **No signal** badge.
 
 ## 3. Filter and search for dead weight
 
-The filter row narrows the list four ways. They stack — combine them freely.
+The filter row narrows the list five ways. They stack — combine them freely.
 
 1. **Search** — type into the search box to match a name, description, or overlap note.
    Good for "show me everything SEO" or finding one item by name.
@@ -106,11 +107,15 @@ The filter row narrows the list four ways. They stack — combine them freely.
    Agents**), each with a count.
 4. **Usage** — **Any usage / Used / Unused / Passive**. Pick **Unused** to surface only
    the `bad` + `warn` rows.
+5. **Duplicates** — the **Duplicates** chip narrows to items flagged as a duplicate of
+   something else (a standalone a plugin supersedes, a same-name copy, a duplicate MCP
+   server). Pair it with the **"Select N redundant copies"** button to clean them in one move.
 
 A line under the filters tells you "X of Y items" so you always know how much the view
 is hiding. To find dead weight fast: click the **unused** stat tile (or the **Unused**
-usage chip), and skim. The overlap notes ("↳ also: …") are worth reading here — they're
-where you'll spot two installs of the same thing.
+usage chip), and skim. The **Duplicates** filter — and the red **"Duplicate"** flags on
+each row — are worth a pass too: that's where you'll spot two installs of the same thing
+and the redundant copies a plugin already provides.
 
 If a filter combination matches nothing, you'll get a "Nothing matches these filters"
 card with a **Reset filters** button.
