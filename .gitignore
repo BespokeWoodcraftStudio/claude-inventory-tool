@@ -42,3 +42,17 @@ stack-cleaner.json
 
 # subagent-driven-development scratch
 .superpowers/
+
+# --- private: machine/personal/process — NEVER publish, kept locally only ---
+# Internal working docs: machine paths, npm account, full process history, the real
+# scanned inventory, and Claude Code project notes. Stay on disk; never tracked.
+/CLAUDE.md
+/docs/_private/
+/docs/SESSION-STATE.md
+/docs/BUILD-LOG.md
+/docs/HANDOFF.md
+/docs/SESSION-LOG.md
+/docs/worklog/
+/docs/superpowers/
+# docs/reference/example-scan-output.json is a SYNTHETIC public sample (tracked);
+# the REAL scan lives in docs/_private/ and is never committed.
