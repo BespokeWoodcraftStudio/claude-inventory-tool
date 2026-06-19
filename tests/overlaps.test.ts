@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeOverlaps, normalizeName } from "../lib/inventory";
+import { computeOverlaps, normalizeName, withOverlaps, redundantIds, computeStats, filterItems, DEFAULT_FILTERS } from "../lib/inventory";
 import type { InventoryItem } from "../lib/types";
 
 const item = (p: Partial<InventoryItem>): InventoryItem => ({
@@ -66,5 +66,28 @@ describe("computeOverlaps — empty / old data", () => {
       item({ id: "plugin:global:p", type: "plugin", name: "p" }), // no bundles (old scan)
     ]);
     expect(map.size).toBe(0);
+  });
+});
+
+describe("withOverlaps + stats + filter", () => {
+  const base = [
+    item({ id: "plugin:global:seo", type: "plugin", name: "claude-seo-skills", bundles: { skills: ["seo-content"] } }),
+    item({ id: "skill:global:seo-content", type: "skill", name: "seo-content", usageClass: "bad" }),
+    item({ id: "skill:global:graphify", type: "skill", name: "graphify", usageClass: "good" }),
+  ];
+  const annotated = withOverlaps(base);
+
+  it("annotates items with their overlaps and leaves others untouched", () => {
+    expect(annotated.find((i) => i.id === "skill:global:seo-content")!.overlaps).toHaveLength(1);
+    expect(annotated.find((i) => i.id === "skill:global:graphify")!.overlaps).toBeUndefined();
+  });
+
+  it("counts redundant items and lists their ids", () => {
+    expect(computeStats(annotated).redundantCount).toBe(1);
+    expect(redundantIds(annotated)).toEqual(["skill:global:seo-content"]);
+  });
+
+  it("filters to overlaps only", () => {
+    expect(filterItems(annotated, { ...DEFAULT_FILTERS, overlapOnly: true })).toHaveLength(1);
   });
 });
