@@ -39,3 +39,6 @@ stack-cleaner.json
 
 # graphify knowledge-graph output (local build artifact, not source)
 /graphify-out/
+
+# subagent-driven-development scratch
+.superpowers/
