@@ -5,6 +5,7 @@
 
 import type {
   Inventory, InventoryItem, ItemType, Scope, UsageClass, UsageSource, UsageSummary,
+  OverlapRelation, PluginBundles,
 } from "./types";
 import { SCHEMA_VERSION } from "./types";
 
@@ -97,12 +98,12 @@ function collapseScanDuplicates(items: InventoryItem[]): InventoryItem[] {
 }
 
 /** Coerce an unknown blob into PluginBundles, keeping only string[] entries. */
-function parseBundles(raw: unknown): import("./types").PluginBundles | undefined {
+function parseBundles(raw: unknown): PluginBundles | undefined {
   if (!raw || typeof raw !== "object") return undefined;
   const r = raw as Record<string, unknown>;
   const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : undefined);
   const skills = arr(r.skills), agents = arr(r.agents), mcps = arr(r.mcps);
-  const out: import("./types").PluginBundles = {};
+  const out: PluginBundles = {};
   if (skills && skills.length) out.skills = skills;
   if (agents && agents.length) out.agents = agents;
   if (mcps && mcps.length) out.mcps = mcps;
@@ -253,6 +254,96 @@ export function deriveRemoveCmd(it: Pick<InventoryItem, "type" | "scope" | "proj
     case "skill":  return scope === "global" ? `rm -rf ~/.claude/skills/${name}` : `git rm -r .claude/skills/${name}`;
     default:       return `# remove ${name}`;
   }
+}
+
+// ---------- overlap / duplicate detection ----------
+
+/**
+ * Normalize a name for cross-item matching. Mirrors the scanner's normalizeName
+ * (public/scan.mjs): lowercase, trim, drop a leading "plugin_"/"plugin:" prefix,
+ * and take the trailing segment of a "ns:name" form ("vercel:deploy" → "deploy").
+ * Keep the two in sync.
+ */
+export function normalizeName(s: string): string {
+  if (!s) return "";
+  let n = String(s).toLowerCase().trim().replace(/^plugin[_:]/, "");
+  if (n.includes(":")) n = n.split(":").pop() as string;
+  return n.trim();
+}
+
+const BUNDLE_KEY: Record<"skill" | "agent" | "mcp", keyof PluginBundles> = {
+  skill: "skills", agent: "agents", mcp: "mcps",
+};
+
+function scopeLabel(it: InventoryItem): string {
+  return it.scope === "global" ? "global" : `project ${it.project ?? "unknown"}`;
+}
+
+/**
+ * Compute structural overlaps. Three precise signals, no fuzzy matching:
+ *  1. bundled-in-plugin — a standalone skill/agent/mcp whose normalized name is in
+ *     an installed plugin's `bundles`. Standalone = redundant, plugin = survivor.
+ *  2. duplicate-name — two non-plugin items of the same type + normalized name in
+ *     different places. Both = peer.
+ *  3. duplicate-mcp — the duplicate-name case for type "mcp" (separate kind label).
+ * Returns a Map keyed by item id; only items with ≥1 relation are present.
+ */
+export function computeOverlaps(items: InventoryItem[]): Map<string, OverlapRelation[]> {
+  const out = new Map<string, OverlapRelation[]>();
+  const add = (id: string, rel: OverlapRelation) => {
+    const arr = out.get(id);
+    if (arr) arr.push(rel); else out.set(id, [rel]);
+  };
+
+  const plugins = items.filter((i) => i.type === "plugin");
+  const nonPlugins = items.filter((i) => i.type !== "plugin");
+
+  // 1. bundled-in-plugin
+  for (const p of plugins) {
+    if (!p.bundles) continue;
+    for (const it of nonPlugins) {
+      if (it.type === "plugin") continue;
+      const key = BUNDLE_KEY[it.type as "skill" | "agent" | "mcp"];
+      const list = p.bundles[key];
+      if (!list) continue;
+      const norm = normalizeName(it.name);
+      if (!list.some((b) => normalizeName(b) === norm)) continue;
+      add(it.id, {
+        kind: "bundled-in-plugin", role: "redundant",
+        withId: p.id, withLabel: p.name,
+        note: `superseded by plugin ${p.name}`,
+      });
+      add(p.id, {
+        kind: "bundled-in-plugin", role: "survivor",
+        withId: it.id, withLabel: it.name,
+        note: `also installed standalone: ${it.name}`,
+      });
+    }
+  }
+
+  // 2 + 3. duplicate-name / duplicate-mcp (group non-plugins by type + normalized name)
+  const groups = new Map<string, InventoryItem[]>();
+  for (const it of nonPlugins) {
+    const k = `${it.type}:${normalizeName(it.name)}`;
+    const arr = groups.get(k);
+    if (arr) arr.push(it); else groups.set(k, [it]);
+  }
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    for (const it of group) {
+      for (const other of group) {
+        if (other.id === it.id) continue;
+        add(it.id, {
+          kind: it.type === "mcp" ? "duplicate-mcp" : "duplicate-name",
+          role: "peer",
+          withId: other.id, withLabel: other.name,
+          note: `also ${scopeLabel(other)}`,
+        });
+      }
+    }
+  }
+
+  return out;
 }
 
 // ---------- stats ----------
