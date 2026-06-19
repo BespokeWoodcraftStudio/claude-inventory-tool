@@ -36,12 +36,13 @@ function usageFields(u: Usage): Partial<InventoryItem> {
 
 function plugin(
   name: string, source: string, usageLabel: string, usageClass: UsageClass,
-  description: string, overlap = "", usage?: Usage,
+  description: string, overlap = "", usage?: Usage, bundles?: InventoryItem["bundles"],
 ): InventoryItem {
   return {
     id: `plugin:global:${name}`, type: "plugin", scope: "global", project: null,
     name, source, description, overlap: overlap || undefined,
     usageClass, usageLabel,
+    bundles,
     removeCmd: `claude plugins uninstall ${name}@${source.split(" ")[0]} -y`,
     ...usageFields(usage),
   };
@@ -99,7 +100,8 @@ const items: InventoryItem[] = [
   plugin("claude-code-setup", "claude-plugins-official 1.0.0", "⚠️ never", "warn", "Analyzes a codebase and recommends hooks/skills/MCPs/agents to install.", "", [0, null]),
   plugin("claude-md-management", "claude-plugins-official 1.0.0", "⚠️ never", "warn", "Audit + improve CLAUDE.md files. Capture session learnings.", "", [0, null]),
   plugin("claude-mem", "thedotmack 13.2.0", "✅ 318 calls", "good", "Persistent cross-session memory + observation extraction + mem-search.", "remember plugin already uninstalled", [318, 0]),
-  plugin("claude-seo-skills", "lionkiii-seo 1.0.0", "✅ 96 calls", "good", "44 SEO commands: site audits, Ahrefs, GSC, SERP, schema, content briefs.", "user-level seo-* bundle (older versions of the same skills); superseo (partial)", [96, 2]),
+  plugin("claude-seo-skills", "lionkiii-seo 1.0.0", "✅ 96 calls", "good", "44 SEO commands: site audits, Ahrefs, GSC, SERP, schema, content briefs.", "user-level seo-* bundle (older versions of the same skills); superseo (partial)", [96, 2],
+    { skills: ["seo", "seo-audit", "seo-backlinks", "seo-cluster", "seo-competitor-pages", "seo-content", "seo-dataforseo", "seo-drift", "seo-geo", "seo-google", "seo-hreflang", "seo-images", "seo-local", "seo-page", "seo-plan", "seo-programmatic", "seo-schema", "seo-sitemap", "seo-technical"] }),
   plugin("github", "claude-plugins-official", "⚠️ never", "warn", "Official GitHub MCP: issues, PRs, repos.", "claude.ai Github connector (4 calls); you use gh CLI heavily", [0, null]),
   plugin("hookify", "claude-plugins-official", "⚠️ never", "warn", "Auto-create Claude Code hooks from conversation pattern analysis.", "", [0, null]),
   plugin("playwright", "claude-plugins-official", "✅ 461 calls", "good", "Browser automation MCP by Microsoft. Heaviest-used MCP in the stack.", "chrome-devtools-mcp already uninstalled", [461, 1]),
@@ -108,7 +110,8 @@ const items: InventoryItem[] = [
   plugin("security-guidance", "claude-plugins-official", "➖ hook-based", "info", "Edit-time hook that warns about injection / XSS / unsafe patterns."),
   plugin("skill-creator", "claude-plugins-official", "⚠️ never", "warn", "Create new skills + run skill evals.", "plugin-dev already uninstalled; this is the survivor", [0, null]),
   plugin("superpowers", "claude-plugins-official 5.1.0", "✅ 73 calls", "good", "Agentic dev methodology: TDD, debugging, planning, parallel agents.", "feature-dev already uninstalled", [73, 3]),
-  plugin("superseo", "superseo-skills 0.2.0", "✅ 41 calls", "good", "9 anti-AI-slop SEO writing skills.", "claude-seo-skills; user-level seo-content", [41, 6]),
+  plugin("superseo", "superseo-skills 0.2.0", "✅ 41 calls", "good", "9 anti-AI-slop SEO writing skills.", "claude-seo-skills; user-level seo-content", [41, 6],
+    { skills: ["eeat-audit", "topic-cluster-planning"] }),
   plugin("ui-ux-pro-max", "ui-ux-pro-max-skill 2.5.0", "⚠️ never", "warn", "67 styles, 161 palettes, 57 font pairings, shadcn/ui MCP.", "frontend-design already uninstalled", [0, null]),
   plugin("vercel", "claude-plugins-official 0.42.1", "✅ 27 calls", "good", "Vercel ecosystem skills + 3 specialist agents (deployment / perf / AI architect).", "claude.ai Vercel connector (handles deploys, 12 calls)", [27, 1]),
 

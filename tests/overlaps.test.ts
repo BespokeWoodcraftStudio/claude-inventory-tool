@@ -92,3 +92,16 @@ describe("withOverlaps + stats + filter", () => {
     expect(filterItems(annotated, { ...DEFAULT_FILTERS, overlapOnly: true })).toHaveLength(2);
   });
 });
+
+import { demoInventory } from "../lib/demo";
+
+describe("demo data shows overlaps", () => {
+  const annotated = withOverlaps(demoInventory.items);
+  it("flags standalone seo-content as superseded by claude-seo-skills", () => {
+    const it = annotated.find((i) => i.id === "skill:global:seo-content");
+    expect(it?.overlaps?.some((r) => r.role === "redundant" && r.withLabel === "claude-seo-skills")).toBe(true);
+  });
+  it("produces a non-empty redundant set in the demo", () => {
+    expect(redundantIds(annotated).length).toBeGreaterThan(3);
+  });
+});
