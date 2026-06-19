@@ -48,6 +48,8 @@ export interface OverlapRelation {
   withId: string;
   /** Display label for the other side, e.g. "claude-seo-skills". */
   withLabel: string;
+  /** Marketplace/source of the other side when meaningful (e.g. a plugin's "lionkiii-seo"). */
+  withSource?: string;
   /** Human-readable note, e.g. "superseded by plugin claude-seo-skills". */
   note: string;
 }

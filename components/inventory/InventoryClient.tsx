@@ -353,6 +353,88 @@ function GroupSection({ label, scope, path, items, selected, onToggle, onSelectM
 // ---------------- item row ----------------
 const TYPE_TONE: Record<ItemType, string> = { skill: "accent", plugin: "info", mcp: "project", agent: "global" };
 
+// Singular noun for an item type, used in the plain-language overlap explanations.
+const TYPE_NOUN: Record<ItemType, string> = { skill: "skill", plugin: "plugin", mcp: "MCP server", agent: "agent" };
+
+/**
+ * Plain-language explanation of why an item is flagged as a duplicate — who provides the
+ * other copy, where this copy lives, and which one to keep. Built so a non-technical user
+ * can actually decide. Renders nothing for items with no overlaps.
+ */
+function OverlapInfo({ item }: { item: InventoryItem }) {
+  const [showAll, setShowAll] = useState(false);
+  const rels = item.overlaps;
+  if (!rels || rels.length === 0) return null;
+
+  const redundant = rels.filter((r) => r.role === "redundant");
+  const peers = rels.filter((r) => r.role === "peer");
+  const survivors = rels.filter((r) => r.role === "survivor");
+  const noun = TYPE_NOUN[item.type];
+
+  const lineStyle = { fontSize: 12.5, color: "var(--fg-soft)", lineHeight: 1.5 } as const;
+  const boxStyle = (accent: string) => ({
+    padding: "7px 9px", borderRadius: "var(--radius-sm)", marginTop: 4,
+    background: `color-mix(in srgb, var(${accent}) 7%, transparent)`,
+    border: `1px solid color-mix(in srgb, var(${accent}) 22%, transparent)`,
+  } as const);
+
+  return (
+    <div className="stack gap-1">
+      {redundant.map((r, i) => (
+        <div key={`r${i}`} className="stack gap-1" style={boxStyle("--bad")}>
+          <span className="badge bad" style={{ width: "fit-content" }}>⧉ Duplicate</span>
+          <span style={lineStyle}>
+            The <strong>{r.withLabel}</strong> plugin
+            {r.withSource ? <> (from <span className="mono">{r.withSource}</span>)</> : null}{" "}
+            ships its own {noun} named <span className="mono">{item.name}</span>, so{" "}
+            {item.path
+              ? <>your loose copy at <span className="mono">{item.path}</span></>
+              : <>your configured {noun} <span className="mono">{item.name}</span></>}{" "}
+            is redundant. The plugin keeps its version updated; this copy won&apos;t — so removing
+            this one is the safe choice.
+          </span>
+        </div>
+      ))}
+
+      {survivors.length > 0 && (() => {
+        const names = survivors.map((s) => s.withLabel);
+        const shown = showAll ? names : names.slice(0, 6);
+        const more = names.length - shown.length;
+        return (
+          <div className="stack gap-1" style={boxStyle("--good")}>
+            <span className="badge good" style={{ width: "fit-content" }}>
+              ⧉ Provides {names.length} item{names.length === 1 ? "" : "s"} you also have standalone
+            </span>
+            <span style={lineStyle}>
+              These loose copies are the duplicates flagged on the matching rows:{" "}
+              {shown.map((n, i) => (
+                <span key={n}><span className="mono">{n}</span>{i < shown.length - 1 ? ", " : ""}</span>
+              ))}
+              {!showAll && more > 0 && (
+                <> … <button className="btn btn-ghost btn-sm" style={{ padding: "0 5px", height: "auto" }} onClick={() => setShowAll(true)}>see all {names.length}</button></>
+              )}
+              {showAll && names.length > 6 && (
+                <> <button className="btn btn-ghost btn-sm" style={{ padding: "0 5px", height: "auto" }} onClick={() => setShowAll(false)}>show fewer</button></>
+              )}
+              . Keep this plugin — it&apos;s the maintained source for all of them.
+            </span>
+          </div>
+        );
+      })()}
+
+      {peers.map((r, i) => (
+        <div key={`p${i}`} className="stack gap-1" style={boxStyle("--accent")}>
+          <span className="badge info" style={{ width: "fit-content" }}>⧉ Duplicate</span>
+          <span style={lineStyle}>
+            Another {noun} named <span className="mono">{item.name}</span> is also installed
+            {" "}({r.note.replace(/^also /, "")}). Same name in two places — keep one.
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** "today" / "3d ago" / "5w ago" / "2mo ago" — compact, low-precision. */
 function relativeTime(epochMs: number, now = Date.now()): string {
   const diff = now - epochMs;
@@ -412,26 +494,7 @@ function ItemRow({ item, checked, onToggle }: { item: InventoryItem; checked: bo
         </div>
         {item.description && <div style={{ fontSize: 13.5, color: "var(--fg-soft)" }}>{item.description}</div>}
         {item.overlap && <div className="muted" style={{ fontSize: 12.5, fontStyle: "italic" }}>↳ also: {item.overlap}</div>}
-        {item.overlaps && item.overlaps.length > 0 && (() => {
-          const redundantRel = item.overlaps.filter((r) => r.role === "redundant");
-          const peerRel = item.overlaps.filter((r) => r.role === "peer");
-          const survives = item.overlaps.filter((r) => r.role === "survivor").length;
-          return (
-            <div className="row gap-1 wrap" style={{ marginTop: 1 }}>
-              {redundantRel.map((r, i) => (
-                <span key={`r${i}`} className="badge bad" title={r.note}>⧉ {r.note}</span>
-              ))}
-              {peerRel.map((r, i) => (
-                <span key={`p${i}`} className="badge info" title={r.note}>⧉ {r.note}</span>
-              ))}
-              {survives > 0 && (
-                <span className="badge good" title="This plugin already provides items you also have installed standalone">
-                  ⧉ provides {survives} standalone {survives === 1 ? "copy" : "copies"}
-                </span>
-              )}
-            </div>
-          );
-        })()}
+        <OverlapInfo item={item} />
         {item.source && <div className="faint mono" style={{ fontSize: 12 }}>{item.source}</div>}
         {checked && (
           <div className="row gap-2" style={{ marginTop: 4 }}>

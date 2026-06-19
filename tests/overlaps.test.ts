@@ -104,4 +104,9 @@ describe("demo data shows overlaps", () => {
   it("produces a non-empty redundant set in the demo", () => {
     expect(redundantIds(annotated).length).toBeGreaterThan(3);
   });
+  it("carries the superseding plugin's marketplace source on the redundant relation", () => {
+    const it = annotated.find((i) => i.id === "skill:global:seo-content");
+    const rel = it?.overlaps?.find((r) => r.role === "redundant");
+    expect(rel?.withSource).toBe("lionkiii-seo"); // first token of "lionkiii-seo 1.0.0"
+  });
 });

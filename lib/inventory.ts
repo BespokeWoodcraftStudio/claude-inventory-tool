@@ -311,6 +311,8 @@ export function computeOverlaps(items: InventoryItem[]): Map<string, OverlapRela
       add(it.id, {
         kind: "bundled-in-plugin", role: "redundant",
         withId: p.id, withLabel: p.name,
+        // The plugin's marketplace (first token; scan stores "marketplace", demo "marketplace version").
+        withSource: (p.source || "").split(" ")[0] || undefined,
         note: `superseded by plugin ${p.name}`,
       });
       add(p.id, {
