@@ -268,7 +268,7 @@ function FilterBar({ inventory, stats, filters, setFilters }: {
         <div className="row" style={{ position: "relative", flex: "1 1 220px", minWidth: 180 }}>
           <span style={{ position: "absolute", left: 12, color: "var(--faint)", display: "flex" }}><Search size={15} /></span>
           <input
-            className="input" style={{ paddingLeft: 34 }} placeholder="Search name, description, overlap…"
+            className="input" style={{ paddingLeft: 34 }} placeholder="Search name, description, duplicate…"
             aria-label="Search inventory"
             value={filters.query} onChange={(e) => setFilters({ ...filters, query: e.target.value })}
           />
@@ -309,7 +309,7 @@ function FilterBar({ inventory, stats, filters, setFilters }: {
         <span style={{ width: 1, background: "var(--line)", margin: "0 4px" }} />
         <button className={`chip${filters.overlapOnly ? " active" : ""}`}
           onClick={() => setFilters({ ...filters, overlapOnly: !filters.overlapOnly })}>
-          Overlaps<span className="count">{stats.overlapCount}</span>
+          Duplicates<span className="count">{stats.overlapCount}</span>
         </button>
       </div>
     </div>
