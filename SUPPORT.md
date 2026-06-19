@@ -55,7 +55,7 @@ If that still gives you trouble, the [Setup page](https://claude-inventory-tool.
 **Fix (easiest):** Skip `curl` entirely and run the published package through npm:
 
 ```bash
-npx claude-inventory-tool
+npx claude-inventory-tool@latest
 ```
 
 If npm is also blocked or you'd rather not hit the network at all, self-host the scanner straight from the source:

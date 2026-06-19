@@ -59,7 +59,7 @@ Yes. The [Setup page](https://claude-inventory-tool.vercel.app/setup) gives you 
 
 That's a healthy instinct. You have options, lightest-touch first:
 
-- **Use npx — no pipe, no curl.** Run `npx claude-inventory-tool`. npm fetches the published, versioned package and runs it. It's the same code as `/scan.mjs`, just delivered through npm instead of a shell pipe.
+- **Use npx — no pipe, no curl.** Run `npx claude-inventory-tool@latest`. npm fetches the published, versioned package and runs it. It's the same code as `/scan.mjs`, just delivered through npm instead of a shell pipe.
 - **Download and read it first.** Save `scan.mjs` to disk, open it, read it (it's one short, dependency-free file), then run `node scan.mjs`.
 - **Clone the repo and run it from source.** `git clone`, then `node public/scan.mjs`.
 

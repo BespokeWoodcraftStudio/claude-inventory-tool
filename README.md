@@ -35,7 +35,7 @@ This tool answers them. You run one command, it reads your local Claude Code ins
 **The one command**, same on macOS, Windows, and Linux, no `curl`, nothing piped:
 
 ```bash
-npx claude-inventory-tool
+npx claude-inventory-tool@latest
 ```
 
 It runs the published npm package (which bundles the same scanner) and writes `claude-inventory.json` next to you. Node ships with Claude Code, so you already have it.

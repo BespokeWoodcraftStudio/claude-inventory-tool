@@ -84,7 +84,7 @@ until you choose to upload the file.
 If you'd rather not have the scan read your transcripts at all, run it with **`--no-transcripts`**:
 
 ```bash
-npx claude-inventory-tool --no-transcripts
+npx claude-inventory-tool@latest --no-transcripts
 # or, from a downloaded script:  node claude-inventory-scan.mjs --no-transcripts
 ```
 

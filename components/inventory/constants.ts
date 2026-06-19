@@ -37,4 +37,4 @@ export const SCAN_TWO_STEP = SCAN_COMMANDS.mac.twoStep;
  * already installs. This is the recommended path; the curl one-liners above stay
  * as the read-it-first / no-npm alternatives.
  */
-export const SCAN_NPX = "npx claude-inventory-tool";
+export const SCAN_NPX = "npx claude-inventory-tool@latest";

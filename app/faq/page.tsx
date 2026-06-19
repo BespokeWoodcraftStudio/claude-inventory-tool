@@ -115,7 +115,7 @@ export default function Faq() {
           <p>That&apos;s a healthy instinct. You have options, lightest-touch first:</p>
           <ul style={{ margin: "8px 0 0", paddingLeft: 20 }}>
             <li>
-              Run <code className="inline">npx claude-inventory-tool</code> instead. No pipe, no{" "}
+              Run <code className="inline">npx claude-inventory-tool@latest</code> instead. No pipe, no{" "}
               <code className="inline">curl</code>: npm fetches the published, versioned package and
               runs it. It&apos;s the same code as <code className="inline">/scan.mjs</code>, just
               delivered through npm.
