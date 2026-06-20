@@ -16,6 +16,7 @@ export function Footer() {
           <Link href="/setup" className="muted">Setup</Link>
           <Link href="/inventory" className="muted">Inventory</Link>
           <Link href="/guide/clean-up-claude-code" className="muted">Guide</Link>
+          <Link href="/guide/claude-code-skills-plugins-mcp-agents" className="muted">Components explained</Link>
           <Link href="/faq" className="muted">FAQ</Link>
           <a href={REPO} target="_blank" rel="noopener noreferrer" className="muted row gap-1">
             <Github size={14} /> GitHub

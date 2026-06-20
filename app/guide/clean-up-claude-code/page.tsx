@@ -57,8 +57,11 @@ export default function CleanUpClaudeCodeGuide() {
       <article className="guide-body">
         <h2>Why does a Claude Code setup get cluttered?</h2>
         <p>
-          Clutter is the natural result of how Claude Code is extended. Skills, plugins, MCP servers,
-          and agents each get added independently, often weeks apart, and almost nothing prompts you
+          Clutter is the natural result of how Claude Code is extended.{" "}
+          <Link href="/guide/claude-code-skills-plugins-mcp-agents">
+            Skills, plugins, MCP servers, and agents
+          </Link>{" "}
+          each get added independently, often weeks apart, and almost nothing prompts you
           to remove the old ones. Worse, the same capability can live in two different scopes:{" "}
           <strong>global</strong>, under <code className="inline">~/.claude</code>, where it applies
           everywhere, and <strong>project</strong>, under a repository&apos;s{" "}

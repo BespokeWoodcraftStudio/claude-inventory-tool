@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/setup`, lastModified },
     { url: `${SITE_URL}/inventory`, lastModified },
     { url: `${SITE_URL}/guide/clean-up-claude-code`, lastModified },
+    { url: `${SITE_URL}/guide/claude-code-skills-plugins-mcp-agents`, lastModified },
     { url: `${SITE_URL}/faq`, lastModified },
   ];
 }
