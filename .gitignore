@@ -57,6 +57,8 @@ stack-cleaner.json
 # docs/reference/example-scan-output.json is a SYNTHETIC public sample (tracked);
 # the REAL scan lives in docs/_private/ and is never committed.
 
-# browser/test scratch — playwright snapshots + ad-hoc screenshots (never commit)
+# browser/test/SEO scratch — playwright snapshots, screenshots, audit helper scripts (never commit)
 /.playwright-mcp/
 /*.png
+/screenshots/
+/scripts/
